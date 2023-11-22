@@ -1,68 +1,63 @@
 from python import Python
 
 
-struct FireApi:
-    var __socket_module: PythonObject
-    var __py: PythonObject
-    var __server: PythonObject
-    var __host: String
-    var __port: Int
+struct EndPoint:
+    var route: String
 
-    fn __init__(inout self, host: String, port: Int) raises -> None:
-        self.__socket_module = None
-        self.__py = None
-        self.__server = None
-        self.__host = host
-        self.__port = port
-
-        # load nessessary python modules
-        self.load_builtins()
-        self.load_socket()
-
-        # create server
-        self.__server = self.create_server()
-
-
-    """ init functions """
-    fn load_builtins(inout self) raises -> None:
-        try:
-            self.__py = Python.import_module("builtins")
-        except:
-            raise("error loading python builtins module.")
+    fn __init__(inout self, route: String, method: String = "GET") -> None:
+        self.route = route
     
-    fn load_socket(inout self) raises -> None:
-        try:
-            self.__socket_module = Python.import_module("socket")
-        except:
-            raise("error loading python socket module")
+    # create custom method here named fn route_method()
+    fn route_method(inout self, x: Int) -> Int:
+        return x * 5
 
-    fn create_server(inout self) raises -> PythonObject:
+
+fn _load_builtins_module() raises -> PythonObject:
+    try:
+        let py = Python.import_module("builtins")
+        return py
+    except:
+        raise("error loading python builtins module.")
+
+
+fn _load_socket_module() raises -> PythonObject:
+    try:
+        let socket_module = Python.import_module("socket")
+        return socket_module
+    except:
+        raise("error loading python socket module.")
+
+
+fn _create_server(inout socket_module: PythonObject) raises -> PythonObject:
+    try:
+        var server = socket_module.socket(
+            socket_module.AF_INET,
+            socket_module.SOCK_STREAM,
+        )
+        return server
+    except:
+        raise("error creating socket server.")
+
+
+fn _print_run_message(host: String, port: Int) -> None:
+    let message = "FireApi server listening @ http://"
+    print(message + host + ":" + port + "/")
+
+
+fn FireApi(host: String = "127.0.0.1", port: Int = 5000) raises -> None:
+    # try loading builtins module
+    let py = Python.import_module("builtins")
+    # try loading socket module
+    let socket_module = Python.import_module("socket")
+
+    _print_run_message(host, port)
+    while True:
         try:
-            let server = self.__socket_module.socket(
-                self.__socket_module.AF_INET,
-                self.__socket_module.SOCK_STREAM,
+            let socket_module = Python.import_module("socket")
+            let server = socket_module.socket(
+                socket_module.AF_INET,
+                socket_module.SOCK_STREAM,
             )
-            return server
+            _ = server.bind((host, port))
         except:
-            raise("error creating server object.")
-
-
-    """ getters (not sure how nessesary this is) """
-    fn server(borrowed self) raises -> PythonObject:
-        if not self.__server:
-            raise("tried getting FireApi object server, but server is none.")
-        return self.__server
-
-    fn host(borrowed self) raises -> String:
-        if not self.__host:
-            raise("tried getting FireApi object host, but host is none.")
-        return self.__host
-    
-    fn port(borrowed self) raises -> Int:
-        if not self.__port:
-            raise("tried getting FireApi object port, but port is none.")
-
-
-    """ main function """
-    fn run(inout self) raises -> None:
-        ...
+            raise("error listening.")

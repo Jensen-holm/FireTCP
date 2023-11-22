@@ -3,7 +3,6 @@ from python import Python
 
 struct EndPoint:
     var route: String
-
     fn __init__(inout self, route: String, method: String = "GET") -> None:
         self.route = route
     
@@ -45,19 +44,13 @@ fn _print_run_message(host: String, port: Int) -> None:
 
 
 fn FireApi(host: String = "127.0.0.1", port: Int = 5000) raises -> None:
-    # try loading builtins module
-    let py = Python.import_module("builtins")
-    # try loading socket module
-    let socket_module = Python.import_module("socket")
+    var py = _load_builtins_module()
+    var socket_module = _load_socket_module()
+    let server = _create_server(socket_module)
 
     _print_run_message(host, port)
     while True:
         try:
-            let socket_module = Python.import_module("socket")
-            let server = socket_module.socket(
-                socket_module.AF_INET,
-                socket_module.SOCK_STREAM,
-            )
             _ = server.bind((host, port))
         except:
             raise("error listening.")

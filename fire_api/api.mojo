@@ -8,6 +8,7 @@ fn _load_socket_module() raises -> PythonObject:
     except Exception:
         raise Error("error loading python socket module.")
 
+
 struct FireApi:
     var socket: PythonObject
     var pySocket: PythonObject
@@ -15,11 +16,8 @@ struct FireApi:
     var hostAddr: StringLiteral
     var port: Int
 
-    fn __init__(
-        inout self, 
-        hostAddr: StringLiteral = "127.0.0.1", 
-        port: Int = 8080,
-        ) raises -> None:
+
+    fn __init__(inout self, hostAddr: StringLiteral = "127.0.0.1", port: Int = 8080) raises -> None:
         self.socket = _load_socket_module()
         self.port = port
         self.hostAddr = hostAddr
@@ -30,7 +28,12 @@ struct FireApi:
             self.socket.AF_INET,
             self.socket.SOCK_STREAM,
         )
+        self.bind()
 
 
     fn bind(borrowed self) raises -> None:
-        _ = self.pySocket.bind((self.hostAddr, self.port))
+        try:
+            _ = self.pySocket.bind((self.hostAddr, self.port))
+        except Exception:
+            raise Error("error binding pysocket to hostAddr & port")
+

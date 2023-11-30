@@ -39,12 +39,13 @@ struct FireApi:
             raise Error("error binding pysocket to hostAddr & port")
 
 
-    fn print_run_message(borrowed self) -> None:
-        return
-    
+    fn _print_running_message(borrowed self) -> None:
+        print("listening at http://" + self._hostName + "/" + self._port)
+
 
     fn run(borrowed self) raises -> None:
-        _ = self.print_run_message()
+
+        self._print_running_message()
         _ = self._pySocket.listen()
 
         let connAddr = self._pySocket.accept()

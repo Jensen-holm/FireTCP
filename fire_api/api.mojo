@@ -10,30 +10,44 @@ fn _load_socket_module() raises -> PythonObject:
 
 
 struct FireApi:
-    var socket: PythonObject
-    var pySocket: PythonObject
-    var hostName: String
-    var hostAddr: StringLiteral
-    var port: Int
+    var _socket: PythonObject
+    var _pySocket: PythonObject
+    var _hostName: String
+    var _hostAddr: StringLiteral
+    var _port: Int
 
 
-    fn __init__(inout self, hostAddr: StringLiteral = "127.0.0.1", port: Int = 8080) raises -> None:
-        self.socket = _load_socket_module()
-        self.port = port
-        self.hostAddr = hostAddr
-        self.pySocket = None
-        self.hostName = ""
+    fn __init__(inout self, hostAddr: StringLiteral = "", port: Int = 8080) raises -> None:
+        self._socket = _load_socket_module()
+        self._port = port
+        self._hostAddr = hostAddr
+        self._hostName = self._socket.gethostbyname(
+            self._socket.gethostname(),
+        ).to_string()
 
-        self.pySocket = self.socket.socket(
-            self.socket.AF_INET,
-            self.socket.SOCK_STREAM,
+        self._pySocket = self._socket.socket(
+            self._socket.AF_INET,
+            self._socket.SOCK_STREAM,
         )
-        self.bind()
+        self._bind_pySocket()
 
 
-    fn bind(borrowed self) raises -> None:
+    fn _bind_pySocket(borrowed self) raises -> None:
         try:
-            _ = self.pySocket.bind((self.hostAddr, self.port))
+            _ = self._pySocket.bind((self._hostAddr, self._port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
+
+    fn print_run_message(borrowed self) -> None:
+        return
+    
+
+    fn run(borrowed self) raises -> None:
+        _ = self.print_run_message()
+        _ = self._pySocket.listen()
+
+        let connAddr = self._pySocket.accept()
+        let conn = connAddr[0]
+        let addr = connAddr[1]
+        print("connected by client ", addr)

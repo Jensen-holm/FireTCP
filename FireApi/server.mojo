@@ -1,6 +1,7 @@
 from python import Python, PythonObject
 from FireApi.modules import _load_socket_module
 from FireApi.connection import Connection
+from FireApi.endpoint import EndPoint
 
 
 struct FireApi:
@@ -24,7 +25,7 @@ struct FireApi:
             self._socket.SOCK_STREAM,
         )
         self._bind_pySocket()
-
+    
 
     fn _bind_pySocket(borrowed self) raises -> None:
         try:
@@ -45,4 +46,12 @@ struct FireApi:
     fn run(borrowed self) raises -> None:
         self._print_running_message()
         _ = self._pySocket.listen()
-        let connection = self._accept_connection()
+
+        # accept incoming connections
+        let connection: Connection = self._accept_connection()
+        print(connection.__str__())
+
+        while True:
+            # recieve data from the accepted connection
+            let data = connection.revieve_data() # 1024 bytes by default
+            # do something with the data and send it back

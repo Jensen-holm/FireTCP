@@ -42,13 +42,22 @@ struct FireApi:
     fn _print_running_message(borrowed self) -> None:
         print("listening at http://" + self._hostName + "/" + self._port)
 
+    
+    fn _accept_connection(borrowed self) raises -> Connection:
+        let connAddr = self._pySocket.accept()
+        return Connection(connAddr)
+
 
     fn run(borrowed self) raises -> None:
-
         self._print_running_message()
         _ = self._pySocket.listen()
+        let connection = self._accept_connection()
 
-        let connAddr = self._pySocket.accept()
-        let conn = connAddr[0]
-        let addr = connAddr[1]
-        print("connected by client ", addr)
+
+struct Connection:
+    var conn: PythonObject
+    var addr: PythonObject
+
+    fn __init__(inout self, connAddr: PythonObject) raises -> None:
+        self.conn = connAddr[0]
+        self.addr = connAddr[1]

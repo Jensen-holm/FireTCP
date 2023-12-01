@@ -32,6 +32,10 @@ struct FireApi:
             _ = self._pySocket.bind((self._hostAddr, self._port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
+    
+
+    fn _close_socket(borrowed self) raises -> None:
+        _ = self._pySocket.close()
 
 
     fn _print_running_message(borrowed self) -> None:
@@ -54,4 +58,8 @@ struct FireApi:
         while True:
             # recieve data from the accepted connection
             let data = connection.revieve_data() # 1024 bytes by default
-            # do something with the data and send it back
+            if not data:
+                break
+
+        connection.close()
+        self._close_socket()

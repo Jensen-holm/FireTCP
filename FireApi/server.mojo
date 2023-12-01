@@ -1,12 +1,6 @@
 from python import Python, PythonObject
-
-
-fn _load_socket_module() raises -> PythonObject:
-    try:
-        let socket = Python.import_module("socket")
-        return socket
-    except Exception:
-        raise Error("error loading python socket module.")
+from FireApi.modules import _load_socket_module
+from FireApi.connection import Connection
 
 
 struct FireApi:
@@ -52,12 +46,3 @@ struct FireApi:
         self._print_running_message()
         _ = self._pySocket.listen()
         let connection = self._accept_connection()
-
-
-struct Connection:
-    var conn: PythonObject
-    var addr: PythonObject
-
-    fn __init__(inout self, connAddr: PythonObject) raises -> None:
-        self.conn = connAddr[0]
-        self.addr = connAddr[1]

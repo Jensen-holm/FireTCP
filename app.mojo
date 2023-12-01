@@ -1,4 +1,4 @@
-from fire_api.api import FireApi
+from FireApi.server import FireApi
 
 
 fn main() raises -> None:

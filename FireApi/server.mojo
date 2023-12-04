@@ -12,7 +12,9 @@ struct Server:
     var _port: Int
     var _endpoint: EndPoint
 
-    fn __init__(inout self, endpoint: EndPoint, hostAddr: StringLiteral = "", port: Int = 8080) raises -> None:
+    fn __init__(
+        inout self, endpoint: EndPoint, hostAddr: StringLiteral = "", port: Int = 8080
+    ) raises -> None:
         self._socket = _load_socket_module()
         self._port = port
         self._hostAddr = hostAddr
@@ -34,7 +36,7 @@ struct Server:
         self._hostAddr = other._hostAddr
         self._port = other._port
         self._endpoint = other._endpoint
-    
+
     fn set_endpoint(inout self, endpoint: EndPoint) -> None:
         self._endpoint = endpoint
 

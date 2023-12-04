@@ -13,14 +13,12 @@ struct Index(EndPoint):
     fn get(borrowed self, request: Request) raises -> Response:
         return Response(
             status_code=200,
-            body=" --- Hello FireApi ---\nRequest Method: 'GET'\nRequest Body: " + request.body,
+            body=" --- Hello FireApi ---\nRequest Method: 'GET'\nRequest Body: "
+            + request.body,
         )
 
     fn post(borrowed self, request: Request) raises -> Response:
-        return Response(
-            status_code=404,
-            body="this endpoint has no method 'POST'"
-        )
+        return Response(status_code=404, body="this endpoint has no method 'POST'")
 
 
 fn main() raises -> None:

@@ -1,5 +1,2 @@
-
-
 struct Client:
     ...
-

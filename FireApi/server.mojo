@@ -12,12 +12,7 @@ struct Server:
     var _port: Int
     var _endpoint: EndPoint
 
-    fn __init__(
-        inout self,
-        endpoint: EndPoint,
-        hostAddr: StringLiteral = "",
-        port: Int = 8080,
-    ) raises -> None:
+    fn __init__(inout self, endpoint: EndPoint, hostAddr: StringLiteral = "", port: Int = 8080) raises -> None:
         self._socket = _load_socket_module()
         self._port = port
         self._hostAddr = hostAddr

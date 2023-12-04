@@ -2,44 +2,40 @@ from FireApi.server import Server
 from FireApi.response import Response
 from FireApi.request import Request
 from FireApi.endpoint import EndPoint
-
-
-"""
-EXAMPLE: FireApi Server EndPoint:
-FireApi currently only supports API's that have one route. This route must be 
-a struct (you can call it whatever you would like) that inherits from the 
-'EndPoint' trait defined in FireApi.endpoint file. 
-"""
+from utils.vector import InlinedFixedVector
 
 
 struct Index(EndPoint):
     var route: String
-    var methods: DynamicVector[String]
+    var has_get: Bool
+    var has_post: Bool
 
-    fn __init__(
-        inout self, 
-        owned methods: DynamicVector[String], 
-        borrowed route: String = "/",
-    ) raises -> None:
+    fn __init__(inout self, has_get: Bool = True, has_post: Bool = False, borrowed route: String = "/") raises -> None:
         self.route = route
-        self.methods = methods
-
-    fn func(borrowed self, request: Request) raises -> Response:
+        self.has_get = has_get
+        self.has_post = has_post
+    
+    fn get(borrowed self, request: Request) raises -> Response:
         return Response(
-            statusCode=200,
-            body=" --- Hello FireApi ---\nRequest body: " + request.body,
+            status_code=200,
+            body=" --- Hello FireApi ---\nRequest Method: 'GET'\nRequest Body: " + request.body,
+        )
+
+    fn post(borrowed self, request: Request) raises -> Response:
+        return Response(
+            status_code=404,
+            body="this endpoint has no method 'POST'"
         )
 
     fn __copyinit__(inout self, other: Self) -> None:
         self.route = other.route
-        self.methods = other.methods
+        self.has_get = other.has_get
+        self.has_post = other.has_post
 
 
 fn main() raises -> None:
-    let methods = DynamicVector[String](2)
-    let index = Index(
-        methods=methods,
+    let app = Server(
+        endpoint=Index(),
     )
 
-    let app = Server(endpoint=index)
     app.run()

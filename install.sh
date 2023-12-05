@@ -12,7 +12,7 @@ cd FireApi && mv * ..
 
 cd .. && rm -rf FireApi examples
 
-cd ..
+cd ../..
 
 mojo package FireApi -o FireApi.📦
 

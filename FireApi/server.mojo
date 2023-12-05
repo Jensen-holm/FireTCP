@@ -73,9 +73,11 @@ struct Server:
                 # return to the user
                 break
 
-            var response: Response = Response(status_code=400, body="bad request")
-            if request.method() == "GET" and route.is_get():
-                response = route.get(request=request)
+            # if the request is the wrong kind of request for this api
+            if route.method() != request.method():
+                break
+
+            # if it is valid
 
             break
 

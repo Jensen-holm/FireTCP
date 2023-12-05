@@ -3,14 +3,14 @@ from FireApi.request import Request
 
 
 trait EndPoint(Copyable):
-    fn get(borrowed self, request: Request) raises -> Response:
-        ...
-
-    fn post(borrowed self, request: Request) raises -> Response:
+    fn func(borrowed self, request: Request) -> Response:
         ...
 
     fn is_get(borrowed self) -> Bool:
         ...
 
     fn is_post(borrowed self) -> Bool:
+        ...
+
+    fn method(borrowed self) -> String:
         ...

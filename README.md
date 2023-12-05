@@ -8,12 +8,10 @@ FireApi is an HTTP API for the AI programming language [mojo]()
  - Python version 3.10 or newer (exact version doesn't really matter)
  - need to set the python library environment variable to compile
 
-### Hello FireApi
+### Hello FireApi Micro Server
 Step 1: `$ mkdir hello_fire_api && cd hello_fire_api` <br>
 Step 2: `$ curl -o- https://raw.githubusercontent.com/Jensen-holm/FireApi/main/install.sh | bash -x`
+Step 3: Once you have made a project and cloned the FireApi you can get coding! Check out the example in examples/hello_fireapi.🔥
 
-Once you have made a project and cloned the FireApi you can get coding! Check out hte example in examples/hello_fireapi.🔥
 
-
-FireApi Servers' can only run one route at a time, that route has to be a struct that inherits from the EndPoint
-trait defined in the FireApi.endpoint file.
+FireApi HTTP Micro Servers can only run one route at a time, that route has to be a struct that inherits from the Route trait defined in the FireApi.route file.

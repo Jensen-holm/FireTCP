@@ -36,7 +36,7 @@ struct PyModules:
             return threading
         except Exception:
             raise Error("error loading the python threading module.")
-        
+
     @staticmethod
     fn __load_builtins_module() raises -> PythonObject:
         try:

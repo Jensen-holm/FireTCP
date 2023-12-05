@@ -47,11 +47,12 @@ struct Server:
         let connAddr = self._py_socket.accept()
         return Connection(connAddr)
 
-
     fn __run_http_server(borrowed self) raises -> None:
-        let httpd = self._modules.http.HTTPServer((self._host_addr, self._port), self._modules.http.SimpleHTTPRequestHandler)
+        let httpd = self._modules.http.HTTPServer(
+            (self._host_addr, self._port+1), 
+            self._modules.http.SimpleHTTPRequestHandler,
+        )
         _ = httpd.serve_forever()
-    
 
     fn run[T: Route](borrowed self: Self, route: T) raises -> None:
         self.__bind_pySocket()

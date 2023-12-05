@@ -1,6 +1,8 @@
 from python import Python, PythonObject
 from FireApi.connection import Connection
 from FireApi.endpoint import EndPoint
+from FireApi.request import Request
+from FireApi.response import Response
 from FireApi.modules import _load_socket_module
 
 
@@ -11,7 +13,9 @@ struct Server:
     var _host_addr: StringLiteral
     var _port: Int
 
-    fn __init__(inout self: Self, host_addr: StringLiteral = "", port: Int = 8080) raises -> None:
+    fn __init__(
+        inout self: Self, host_addr: StringLiteral = "", port: Int = 8080
+    ) raises -> None:
         self._port = port
         self._host_addr = host_addr
         self._host_name = None
@@ -34,7 +38,7 @@ struct Server:
     fn _accept_connection(borrowed self) raises -> Connection:
         let connAddr = self._py_socket.accept()
         return Connection(connAddr)
-    
+
     fn _pre_run_setup(inout self) raises -> None:
         self._host_name = self._socket.gethostbyname(
             self._socket.gethostname(),
@@ -45,9 +49,6 @@ struct Server:
             self._socket.SOCK_STREAM,
         )
 
-    fn run_route[T: EndPoint](borrowed self: Self, endpoint: T) -> None:
-        let route: T = endpoint
-
     fn run[T: EndPoint](borrowed self: Self, route: T) raises -> None:
         self._bind_pySocket()
         self._print_running_message()
@@ -57,19 +58,25 @@ struct Server:
         let connection: Connection = self._accept_connection()
         while True:
             # recieve data from the accepted connection
-            let data = connection.revieve_data()  # 1024 bytes by default
-            if not data:
+            let request_str: String = connection.revieve_data()  # 1024 bytes by default
+            if not request_str:
                 break
 
             # make a request object that can be passed into the users endpoint
+            let request = Request(body=request_str)
 
-            # run the request through the users endpoint function to get a response
+            if not request.is_valid():
+                let response = Response(
+                    status_code=505,
+                    body="bad request, not valid",
+                )
+                # return to the user
+                break
 
-            # turn that response into something that can be sent over http
+            var response: Response = Response(status_code=400, body="bad request")
+            if request.method() == "GET" and route.is_get():
+                response = route.get(request=request)
 
-            # return it to the client
-
-            # end loop
             break
 
         connection.close()

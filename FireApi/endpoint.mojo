@@ -8,3 +8,9 @@ trait EndPoint(Copyable):
 
     fn post(borrowed self, request: Request) raises -> Response:
         ...
+
+    fn is_get(borrowed self) -> Bool:
+        ...
+
+    fn is_post(borrowed self) -> Bool:
+        ...

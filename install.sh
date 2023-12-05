@@ -11,3 +11,7 @@ rm -f install.sh
 cd FireApi && mv * ..
 
 cd .. && rm -rf FireApi examples
+
+mojo package FireApi -o FireApi.📦
+
+mkdir packages && mv FireApi.📦 packages

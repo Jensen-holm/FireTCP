@@ -2,15 +2,9 @@ from FireApi.response import Response
 from FireApi.request import Request
 
 
-trait EndPoint(Copyable):
-    fn func(borrowed self, request: Request) -> Response:
+trait EndPoint:
+    fn func(self, request: Request) raises -> Response:
         ...
 
-    fn is_get(borrowed self) -> Bool:
-        ...
-
-    fn is_post(borrowed self) -> Bool:
-        ...
-
-    fn method(borrowed self) -> String:
+    fn get_method(borrowed self) -> String:
         ...

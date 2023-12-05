@@ -74,7 +74,7 @@ struct Server:
                 break
 
             # if the request is the wrong kind of request for this api
-            if route.method() != request.method():
+            if route.get_method() != request.method():
                 break
 
             # if it is valid

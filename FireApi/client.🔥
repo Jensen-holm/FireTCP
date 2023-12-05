@@ -1,4 +1,34 @@
-struct Client:
+from FireApi.modules import PyModules
+from FireApi.response import Response
+from FireApi.request import Request
 
-    fn __init__(inout self) raises -> None:
-        ...
+
+struct Client:
+    var _modules: PyModules
+    var _client_socket: PythonObject
+    var _host_name: String
+    var _port: Int
+
+    fn __init__(inout self, host_name: String, port: Int) raises -> None:
+        self._modules = PyModules()
+        self._client_socket = self._modules.socket.socket()
+        self._host_name = host_name
+        self._port = port
+
+    fn send_request(borrowed self, request: Request) raises -> Response:
+        _ = self._client_socket.connect((self._host_name, self._port))
+        let request_bytes = request.to_bytes(
+            py_builtins=self._modules.py,
+        )
+
+        self._client_socket.send(request_bytes.encode())
+        let raw_response = self._client_socket.recv(1024).decode()
+        print(raw_response)
+
+        _ = self._client_socket.close()
+
+        return Response(
+            status_code=200,
+            body=str(raw_response),
+        )
+

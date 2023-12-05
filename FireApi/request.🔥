@@ -1,3 +1,6 @@
+from python import PythonObject
+
+
 struct Request:
     var body: String
 
@@ -15,3 +18,7 @@ struct Request:
                 break
             method += self.body[i]
         return method
+    
+    fn to_bytes(borrowed self, py_builtins: PythonObject) raises -> PythonObject:
+        let byte_string = py_builtins.bytes(self.body)
+        return byte_string

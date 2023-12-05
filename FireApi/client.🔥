@@ -31,4 +31,3 @@ struct Client:
             status_code=200,
             body=str(raw_response),
         )
-

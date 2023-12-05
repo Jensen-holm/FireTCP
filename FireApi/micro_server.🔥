@@ -40,7 +40,7 @@ struct HTTPMicroService:
     fn __print_running[T: Route](borrowed self, route: T) -> None:
         let endpoint = "http://" + str(
             self._host_name
-        ) + "/" + self._port + route.get_route()
+        ) + "/" + self._port + route.get_endpoint()
         print("🔥🔥🔥 FireApi Micro HTTP Server 🔥🔥🔥\n\t" + endpoint)
 
     fn __accept_connection(borrowed self) raises -> Connection:

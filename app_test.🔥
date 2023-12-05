@@ -3,7 +3,7 @@ from FireApi import Route, HTTPMicroService, Response, Request
 
 @value
 struct MyRoute(Route):
-    var route: String
+    var endpoint: String
     var method: String
 
     fn func(self, request: Request) raises -> Response:
@@ -15,15 +15,15 @@ struct MyRoute(Route):
     fn get_method(self) -> String:
         return self.method
 
-    fn get_route(self) -> String:
-        return self.route
+    fn get_endpoint(self) -> String:
+        return self.endpoint
 
 
 fn main() raises -> None:
     let app = HTTPMicroService()
 
     let main_route = MyRoute(
-        route="/",
+        endpoint="/",
         method="GET",
     )
 

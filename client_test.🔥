@@ -1,0 +1,17 @@
+from FireApi import Client, Request, Response
+
+
+
+fn main() raises -> None:
+    let client = Client(
+        host_name="127.00.1",
+        port=8080,
+    )
+
+    let request = Request(
+        body="hello world",
+    )
+
+    let response = client.send_request(
+        request=request,
+    )

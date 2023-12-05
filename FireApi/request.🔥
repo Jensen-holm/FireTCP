@@ -7,18 +7,18 @@ struct Request:
     fn __init__(inout self, body: String) raises -> None:
         self.body = body
 
-    fn is_valid(borrowed self) -> Bool:
+    fn is_valid(self) -> Bool:
         return True
 
     # should only be ran if is_valid() is True
-    fn method(borrowed self) -> String:
+    fn method(self) -> String:
         var method: String = ""
         for i in range(len(self.body)):
             if not self.body[i]:
                 break
             method += self.body[i]
         return method
-    
-    fn to_bytes(borrowed self, py_builtins: PythonObject) raises -> PythonObject:
+
+    fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
         let byte_string = py_builtins.bytes(self.body)
         return byte_string

@@ -5,7 +5,7 @@ from FireApi.endpoint import EndPoint
 
 
 @value
-struct Index(EndPoint):
+struct MainRoute(EndPoint):
     var route: String
     var has_get: Bool
     var has_post: Bool
@@ -22,14 +22,11 @@ struct Index(EndPoint):
 
 
 fn main() raises -> None:
-    let index_route = Index(
+    let main_route = MainRoute(
         has_get=True,
         has_post=False,
         route="/",
     )
 
-    let app = Server(
-        endpoint=index_route,
-    )
-
-    app.run()
+    let app = Server()
+    app.run[MainRoute](route=main_route)

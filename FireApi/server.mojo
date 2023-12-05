@@ -6,59 +6,52 @@ from FireApi.modules import _load_socket_module
 
 struct Server:
     var _socket: PythonObject
-    var _pySocket: PythonObject
-    var _hostName: PythonObject
-    var _hostAddr: StringLiteral
+    var _py_socket: PythonObject
+    var _host_name: PythonObject
+    var _host_addr: StringLiteral
     var _port: Int
-    var _endpoint: EndPoint
 
-    fn __init__(
-        inout self, endpoint: EndPoint, hostAddr: StringLiteral = "", port: Int = 8080
-    ) raises -> None:
-        self._socket = _load_socket_module()
+    fn __init__(inout self: Self, host_addr: StringLiteral = "", port: Int = 8080) raises -> None:
         self._port = port
-        self._hostAddr = hostAddr
-        self._hostName = self._socket.gethostbyname(
-            self._socket.gethostname(),
-        )
-
-        self._pySocket = self._socket.socket(
-            self._socket.AF_INET,
-            self._socket.SOCK_STREAM,
-        )
-        self._endpoint = endpoint
-        self._bind_pySocket()
-
-    fn __copyinit__(inout self, other: Self) -> None:
-        self._socket = other._socket
-        self._pySocket = other._pySocket
-        self._hostName = other._hostName
-        self._hostAddr = other._hostAddr
-        self._port = other._port
-        self._endpoint = other._endpoint
-
-    fn set_endpoint(inout self, endpoint: EndPoint) -> None:
-        self._endpoint = endpoint
+        self._host_addr = host_addr
+        self._host_name = None
+        self._py_socket = None
+        self._socket = _load_socket_module()
+        self._pre_run_setup()
 
     fn _bind_pySocket(borrowed self) raises -> None:
         try:
-            _ = self._pySocket.bind((self._hostAddr, self._port))
+            _ = self._py_socket.bind((self._host_addr, self._port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
     fn _close_socket(borrowed self) raises -> None:
-        _ = self._pySocket.close()
+        _ = self._py_socket.close()
 
     fn _print_running_message(borrowed self) raises -> None:
-        print("listening at http://" + self._hostName.__str__() + "/" + self._port)
+        print("listening at http://" + self._host_name.__str__() + "/" + self._port)
 
     fn _accept_connection(borrowed self) raises -> Connection:
-        let connAddr = self._pySocket.accept()
+        let connAddr = self._py_socket.accept()
         return Connection(connAddr)
+    
+    fn _pre_run_setup(inout self) raises -> None:
+        self._host_name = self._socket.gethostbyname(
+            self._socket.gethostname(),
+        )
 
-    fn run(borrowed self) raises -> None:
+        self._py_socket = self._socket.socket(
+            self._socket.AF_INET,
+            self._socket.SOCK_STREAM,
+        )
+
+    fn run_route[T: EndPoint](borrowed self: Self, endpoint: T) -> None:
+        let route: T = endpoint
+
+    fn run[T: EndPoint](borrowed self: Self, route: T) raises -> None:
+        self._bind_pySocket()
         self._print_running_message()
-        _ = self._pySocket.listen()
+        _ = self._py_socket.listen()
 
         # accept incoming connections
         let connection: Connection = self._accept_connection()

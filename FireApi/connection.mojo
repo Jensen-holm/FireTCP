@@ -10,7 +10,7 @@ struct Connection:
         self.addr = connAddr[1]
 
     fn revieve_data(borrowed self, size: Int = 1024) raises -> String:
-        let data = self.conn.recv(size)
+        let data = self.conn.recv(size).decode("utf-8")
         return str(data)
 
     fn close(borrowed self) raises -> None:

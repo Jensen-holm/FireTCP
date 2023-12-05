@@ -1,7 +1,4 @@
-from FireApi.server import Server
-from FireApi.response import Response
-from FireApi.request import Request
-from FireApi.endpoint import EndPoint
+from FireApi import Server, EndPoint, Response, Request
 
 
 @value

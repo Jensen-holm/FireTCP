@@ -1,4 +1,4 @@
-from FireApi import Route, Server, Response, Request
+from FireApi import Route, HTTPMicroService, Response, Request
 
 
 @value
@@ -20,7 +20,7 @@ struct MyRoute(Route):
 
 
 fn main() raises -> None:
-    let app = Server()
+    let app = HTTPMicroService()
 
     let main_route = MyRoute(
         route="/",

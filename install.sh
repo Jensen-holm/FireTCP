@@ -6,7 +6,7 @@ cd FireApi
 
 rm -rf .git .gitignore test
 
-rm -f install.sh
+rm -f install.sh *_test.🔥
 
 cd FireApi && mv * ..
 

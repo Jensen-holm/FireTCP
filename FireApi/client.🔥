@@ -21,7 +21,7 @@ struct Client:
             py_builtins=self._modules.py,
         )
 
-        self._client_socket.send(request_bytes.encode())
+        _ = self._client_socket.send(request_bytes.encode())
         let raw_response = self._client_socket.recv(1024).decode()
         print(raw_response)
 

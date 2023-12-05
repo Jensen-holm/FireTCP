@@ -88,7 +88,3 @@ struct HTTPMicroService:
 
         connection.close()
         self.__close_socket()
-
-    fn run_forever[T: Route](self, route: T) raises -> None:
-        while True:
-            self.run[T](route=route)

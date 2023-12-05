@@ -12,6 +12,8 @@ cd FireApi && mv * ..
 
 cd .. && rm -rf FireApi examples
 
+cd ..
+
 mojo package FireApi -o FireApi.📦
 
 mkdir packages && mv FireApi.📦 packages

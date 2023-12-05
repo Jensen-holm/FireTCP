@@ -57,13 +57,13 @@ struct HTTPMicroService:
         print_no_newline("connection from:", connection.addr)
         while True:
             # recieve data from the accepted connection
-            let request_str: String = connection.revieve_data()  # 1024 bytes by default
+            let request_str: String = connection.recieve_data()  # 1024 bytes by default
             print("request:", request_str)
             if not request_str:
                 break
 
             # make a request object that can be passed into the users endpoint
-            let request = Request(body=request_str)
+            let request = Request.from_raw(raw_response=request_str)
 
             if not request.is_valid():
                 let response = Response(

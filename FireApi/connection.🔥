@@ -9,12 +9,12 @@ struct Connection:
         self.conn = connAddr[0]
         self.addr = connAddr[1]
 
-    fn revieve_data(borrowed self, size: Int = 1024) raises -> String:
+    fn recieve_data(self, size: Int = 1024) raises -> String:
         let data = self.conn.recv(size).decode("utf-8")
-        return str(data)
+        return data.__str__()
 
-    fn send_all_data(borrowed self, response_bytes: PythonObject) raises -> None:
-        _ = self.conn.send_all(response_bytes)
+    fn send_all_data(self, response_bytes: PythonObject) raises -> None:
+        _ = self.conn.send_all(response_bytes.encode("utf-8"))
 
-    fn close(borrowed self) raises -> None:
+    fn close(self) raises -> None:
         _ = self.conn.close()

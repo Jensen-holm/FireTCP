@@ -5,9 +5,18 @@ struct Response:
     var status_code: Int
     var body: String
 
-    fn __init__(inout self, status_code: Int, body: String) raises -> None:
+    fn __init__(inout self, status_code: Int, body: String) -> None:
         self.status_code = status_code
         self.body = body
 
-    fn to_bytes(borrowed self, py_builtins: PythonObject) raises -> PythonObject:
-        return py_builtins.bytes(self.body)
+    fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
+        return py_builtins.bytes(self.body, "utf-8")
+
+    @staticmethod
+    fn from_raw(raw_response: String) -> Self:
+        # construct a Response object from a raw HTTP response string
+        print(raw_response)
+        return Response(
+            status_code=200,
+            body="",
+        )

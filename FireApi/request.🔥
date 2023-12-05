@@ -4,7 +4,7 @@ from python import PythonObject
 struct Request:
     var body: String
 
-    fn __init__(inout self, body: String) raises -> None:
+    fn __init__(inout self, body: String) -> None:
         self.body = body
 
     fn is_valid(self) -> Bool:
@@ -20,5 +20,12 @@ struct Request:
         return method
 
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
-        let byte_string = py_builtins.bytes(self.body)
+        let byte_string = py_builtins.bytes(self.body, "utf-8")
         return byte_string
+
+    @staticmethod
+    fn from_raw(raw_response: String) -> Request:
+        print(raw_response)
+        return Request(
+            body="",
+        )

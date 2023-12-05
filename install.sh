@@ -6,6 +6,4 @@ cd FireApi
 
 rm -rf .git .gitignore
 
-cd FireApi && rm -rf examples
-
-mv * ..
+cd FireApi && mv * ..

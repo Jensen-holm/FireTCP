@@ -1,13 +1,13 @@
 from python import Python, PythonObject
 from FireApi.connection import Connection
-from FireApi.endpoint import EndPoint
+from FireApi.route import Route
 from FireApi.request import Request
 from FireApi.response import Response
-from FireApi.modules import _load_socket_module
+from FireApi.modules import PyModules
 
 
 struct Server:
-    var _socket: PythonObject
+    var _modules: PyModules
     var _py_socket: PythonObject
     var _host_name: PythonObject
     var _host_addr: StringLiteral
@@ -18,44 +18,49 @@ struct Server:
     ) raises -> None:
         self._port = port
         self._host_addr = host_addr
-        self._host_name = None
-        self._py_socket = None
-        self._socket = _load_socket_module()
-        self._pre_run_setup()
+        self._modules = PyModules()
 
-    fn _bind_pySocket(borrowed self) raises -> None:
+        self._host_name = self._modules.socket.gethostbyname(
+            self._modules.socket.gethostname(),
+        )
+        self._py_socket = self._modules.socket.socket(
+            self._modules.socket.AF_INET,
+            self._modules.socket.SOCK_STREAM,
+        )
+
+    fn __bind_pySocket(borrowed self) raises -> None:
         try:
             _ = self._py_socket.bind((self._host_addr, self._port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
-    fn _close_socket(borrowed self) raises -> None:
+    fn __close_socket(borrowed self) raises -> None:
         _ = self._py_socket.close()
 
-    fn _print_running_message(borrowed self) raises -> None:
-        print("listening at http://" + self._host_name.__str__() + "/" + self._port)
+    fn __print_running[T: Route](borrowed self, route: T) -> None:
+        let endpoint = "http://" + str(
+            self._host_name
+        ) + "/" + self._port + route.get_route()
+        print("\t--- FireApi Server ---\nlistening at " + endpoint)
 
-    fn _accept_connection(borrowed self) raises -> Connection:
+    fn __accept_connection(borrowed self) raises -> Connection:
         let connAddr = self._py_socket.accept()
         return Connection(connAddr)
 
-    fn _pre_run_setup(inout self) raises -> None:
-        self._host_name = self._socket.gethostbyname(
-            self._socket.gethostname(),
-        )
 
-        self._py_socket = self._socket.socket(
-            self._socket.AF_INET,
-            self._socket.SOCK_STREAM,
-        )
+    fn __run_http_server(borrowed self) raises -> None:
+        let httpd = self._modules.http.HTTPServer((self._host_addr, self._port), self._modules.http.SimpleHTTPRequestHandler)
+        _ = httpd.serve_forever()
+    
 
-    fn run[T: EndPoint](borrowed self: Self, route: T) raises -> None:
-        self._bind_pySocket()
-        self._print_running_message()
-        _ = self._py_socket.listen()
+    fn run[T: Route](borrowed self: Self, route: T) raises -> None:
+        self.__bind_pySocket()
+        self.__print_running[T](route=route)
+        # _ = self._py_socket.listen()
+        self.__run_http_server()
 
         # accept incoming connections
-        let connection: Connection = self._accept_connection()
+        let connection: Connection = self.__accept_connection()
         while True:
             # recieve data from the accepted connection
             let request_str: String = connection.revieve_data()  # 1024 bytes by default
@@ -82,4 +87,4 @@ struct Server:
             break
 
         connection.close()
-        self._close_socket()
+        self.__close_socket()

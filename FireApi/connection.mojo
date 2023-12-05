@@ -13,5 +13,11 @@ struct Connection:
         let data = self.conn.recv(size).decode("utf-8")
         return str(data)
 
+    fn send_all_data(
+        borrowed self, response: Response, py: PythonObject
+    ) raises -> None:
+        let byte_response = py.bytes(response.body)
+        _ = self.conn.send_all(byte_response)
+
     fn close(borrowed self) raises -> None:
         _ = self.conn.close()

@@ -1,0 +1,5 @@
+from FireApi import Client
+
+
+fn main() raises -> None:
+    let client = Client()

@@ -27,4 +27,4 @@ fn main() raises -> None:
         method="GET",
     )
 
-    app.run[MyRoute](route=main_route)
+    app.run_forever[MyRoute](route=main_route)

@@ -28,26 +28,26 @@ struct HTTPMicroService:
             self._modules.socket.SOCK_STREAM,
         )
 
-    fn __bind_pySocket(borrowed self) raises -> None:
+    fn __bind_pySocket(self) raises -> None:
         try:
             _ = self._py_socket.bind((self._host_addr, self._port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
-    fn __close_socket(borrowed self) raises -> None:
+    fn __close_socket(self) raises -> None:
         _ = self._py_socket.close()
 
-    fn __print_running[T: Route](borrowed self, route: T) -> None:
+    fn __print_running[T: Route](self, route: T) -> None:
         let endpoint = "http://" + str(
             self._host_name
         ) + "/" + self._port + route.get_endpoint()
         print("🔥🔥🔥 FireApi Micro HTTP Server 🔥🔥🔥\n\t" + endpoint)
 
-    fn __accept_connection(borrowed self) raises -> Connection:
+    fn __accept_connection(self) raises -> Connection:
         let connAddr = self._py_socket.accept()
         return Connection(connAddr)
 
-    fn run[T: Route](borrowed self: Self, route: T) raises -> None:
+    fn run[T: Route](self, route: T) raises -> None:
         self.__bind_pySocket()
         self.__print_running[T](route=route)
         _ = self._py_socket.listen()
@@ -88,3 +88,7 @@ struct HTTPMicroService:
 
         connection.close()
         self.__close_socket()
+
+    fn run_forever[T: Route](self, route: T) raises -> None:
+        while True:
+            self.run[T](route=route)

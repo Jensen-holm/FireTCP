@@ -6,10 +6,10 @@ from FireApi.request import Request
 struct Client:
     var _modules: PyModules
     var _client_socket: PythonObject
-    var _host_name: String
+    var _host_name: StringLiteral
     var _port: Int
 
-    fn __init__(inout self, host_name: String, port: Int) raises -> None:
+    fn __init__(inout self, host_name: StringLiteral, port: Int) raises -> None:
         self._modules = PyModules()
         self._client_socket = self._modules.socket.socket()
         self._host_name = host_name

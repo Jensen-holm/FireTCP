@@ -15,9 +15,10 @@ Step 3: Once you have made a project and cloned the FireApi you can get coding! 
 
 
 ### HTTP Micro Service Hello World
+
+in a file called service.🔥
 ```py
 from FireApi import Route, HTTPMicro, Response, Request
-
 
 @value
 struct MyRoute(Route):
@@ -29,7 +30,6 @@ struct MyRoute(Route):
             status_code=200,
             body="You sent: " + request.body,
         )
-        time.sleep(1)
         return response
 
     fn get_method(self) -> String:
@@ -50,9 +50,32 @@ fn main() raises -> None:
     service.run[MyRoute](route=main_route)
 ```
 
-```py
+### Client Hello World
 
+in a file called client.🔥
+```py
+from FireApi import Client, Request, Response
+
+
+fn main() raises -> None:
+    let client = Client(
+        host_name="127.00.1",
+        port=9090,
+        endpoint="/index",
+    )
+
+    let request = Request(
+        body="hello world",
+    )
+
+    let response: Response = client.send_request(
+        request=request,
+    )
+
+    print(response.body)
 ```
 
+run the service first using the mojo cli: `mojo run server.🔥` <br>
+then, run the client to connect to the service: `mojo run client.🔥` <br>
 
 FireApi HTTP Micro Servers can only run one route at a time, that route has to be a struct that inherits from the Route trait defined in the FireApi.route file.

@@ -5,6 +5,7 @@ fn main() raises -> None:
     let client = Client(
         host_name="127.00.1",
         port=9090,
+        endpoint="/index",
     )
 
     let request = Request(

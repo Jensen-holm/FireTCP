@@ -8,12 +8,14 @@ struct Client:
     var _client_socket: PythonObject
     var _host_name: StringLiteral
     var _port: Int
+    var endpoint: String
 
-    fn __init__(inout self, host_name: StringLiteral, port: Int) raises -> None:
+    fn __init__(inout self, host_name: StringLiteral, port: Int, endpoint: String) raises -> None:
         self._modules = PyModules()
         self._client_socket = self._modules.socket.socket()
         self._host_name = host_name
         self._port = port
+        self.endpoint = endpoint
 
     fn send_request(self, request: Request) raises -> Response:
         _ = self._client_socket.connect((self._host_name, self._port))

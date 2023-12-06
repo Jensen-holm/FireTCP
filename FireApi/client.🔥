@@ -23,10 +23,8 @@ struct Client:
 
         _ = self._client_socket.send(request_bytes)
         let raw_response = self._client_socket.recv(1024).decode()
-        print(raw_response)
 
         _ = self._client_socket.close()
-
         return Response(
             status_code=200,
             body=str(raw_response),

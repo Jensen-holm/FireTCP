@@ -1,7 +1,8 @@
 from python import PythonObject
 
 
-struct Response:
+@value
+struct Response(Copyable):
     var status_code: Int
     var body: String
 
@@ -14,9 +15,7 @@ struct Response:
 
     @staticmethod
     fn from_raw(raw_response: String) -> Self:
-        # construct a Response object from a raw HTTP response string
-        print(raw_response)
         return Response(
             status_code=200,
-            body="",
+            body=raw_response,
         )

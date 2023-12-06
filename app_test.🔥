@@ -9,7 +9,7 @@ struct MyRoute(Route):
     fn func(self, request: Request) raises -> Response:
         return Response(
             status_code=200,
-            body="Hello FireApi!",
+            body="You sent: " + request.body,
         )
 
     fn get_method(self) -> String:

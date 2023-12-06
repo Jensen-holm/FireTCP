@@ -24,8 +24,7 @@ struct Request:
         return byte_string
 
     @staticmethod
-    fn from_raw(raw_response: String) -> Request:
-        print(raw_response)
+    fn from_raw(raw_request: String) -> Request:
         return Request(
-            body="",
+            body=raw_request,
         )

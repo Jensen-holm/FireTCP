@@ -11,6 +11,8 @@ fn main() raises -> None:
         body="hello world",
     )
 
-    let response = client.send_request(
+    let response: Response = client.send_request(
         request=request,
     )
+
+    print(response.body)

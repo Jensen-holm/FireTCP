@@ -27,6 +27,7 @@ struct HTTPMicroService:
             self._modules.socket.AF_INET,
             self._modules.socket.SOCK_STREAM,
         )
+        self.__bind_pySocket()
 
     fn __bind_pySocket(self) raises -> None:
         try:
@@ -34,57 +35,52 @@ struct HTTPMicroService:
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
+    # right now we are never using this function and I wonder if that is bad or not ...
     fn __close_socket(self) raises -> None:
         _ = self._py_socket.close()
 
     fn __print_running[T: Route](self, route: T) -> None:
+        let fire = "🔥🔥🔥"
         let endpoint = "http://" + str(
             self._host_name
         ) + "/" + self._port + route.get_endpoint()
-        print("🔥🔥🔥 FireApi Micro HTTP Server 🔥🔥🔥\n\t" + endpoint)
+        print(fire + "FireApi Micro HTTP Server @ " + endpoint + fire)
 
     fn __accept_connection(self) raises -> Connection:
-        let connAddr = self._py_socket.accept()
-        return Connection(connAddr)
+        let conn_addr = self._py_socket.accept()
+        return Connection(conn_addr=conn_addr, py=self._modules.py)
 
-    fn run[T: Route](self, route: T) raises -> None:
-        self.__bind_pySocket()
-        self.__print_running[T](route=route)
+    fn run[T: Route](self, route: T, _call: Int = 0) raises -> None:
+        if not _call:
+            self.__print_running[T](route=route)
+
         _ = self._py_socket.listen()
-
-        # accept incoming connections
         let connection: Connection = self.__accept_connection()
-        print_no_newline("connection from:", connection.addr)
+        print("connection from:", connection.__str__())
         while True:
-            # recieve data from the accepted connection
-            let request_str: String = connection.recieve_data()  # 1024 bytes by default
-            print("request:", request_str)
-            if not request_str:
-                break
-
-            # make a request object that can be passed into the users endpoint
-            let request = Request.from_raw(raw_response=request_str)
-
-            if not request.is_valid():
-                let response = Response(
-                    status_code=505,
-                    body="bad request, not valid",
-                )
-                # return to the user
-                break
-
-            # if the request is the wrong kind of request for this api
-            if route.get_method() != request.method():
-                break
-
-            # if it is valid
-            let response = route.func(request=request)
-            let response_bytes: PythonObject = response.to_bytes(
-                py_builtins=self._modules.py,
+            let response: Response = self.__handle_request[T](
+                route=route, connection=connection, _call=_call
             )
-            _ = connection.send_all_data(response_bytes=response_bytes)
+            _ = connection.send_response(response)
+            connection.close()
+            self.run[T](route=route, _call=_call + 1)
 
-            break
+    fn __handle_request[
+        T: Route
+    ](self, route: T, connection: Connection, _call: Int) raises -> Response:
+        let request_str = connection.recieve_data(size=1024)
+        if not request_str:
+            return Response(
+                status_code=400,
+                body="invalid request. Server was unable to recieve data.",
+            )
 
-        connection.close()
-        self.__close_socket()
+        let request = Request.from_raw(request_str)
+        if not request.is_valid():
+            return Response(
+                status_code=400,
+                body="invalid request. client request was deemed invalid.",
+            )
+
+        let response: Response = route.func(request=request)
+        return response

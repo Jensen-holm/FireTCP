@@ -10,7 +10,7 @@ FireApi is an HTTP API for the AI programming language [mojo]()
 
 ### Hello FireApi Micro Server
 Step 1: `$ mkdir hello_fire_api && cd hello_fire_api` <br>
-Step 2: `$ curl -o- https://raw.githubusercontent.com/Jensen-holm/FireApi/main/install.sh | bash -x`
+Step 2: `$ curl -sS https://raw.githubusercontent.com/Jensen-holm/FireApi/main/install.sh | bash`
 Step 3: Once you have made a project and cloned the FireApi you can get coding! Check out the example in examples/hello_fireapi.🔥
 
 

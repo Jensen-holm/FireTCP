@@ -1,5 +1,4 @@
 from FireApi import Route, HTTPMicro, Response, Request
-import time
 
 
 @value
@@ -12,7 +11,6 @@ struct MyRoute(Route):
             status_code=200,
             body="You sent: " + request.body,
         )
-        time.sleep(1)
         return response
 
     fn get_method(self) -> String:

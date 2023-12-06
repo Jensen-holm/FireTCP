@@ -14,7 +14,7 @@ struct Connection:
 
     fn recieve_data(self, size: Int = 1024) raises -> String:
         let data = self.conn.recv(size).decode("utf-8")
-        return data.__str__()
+        return str(data)
 
     fn send_response(self, response: Response) raises -> None:
         let response_bytes = response.to_bytes(py_builtins=self._py)

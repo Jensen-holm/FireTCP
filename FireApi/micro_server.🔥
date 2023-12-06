@@ -14,7 +14,7 @@ struct HTTPMicro:
     var __host_addr: StringLiteral
     var __port: Int
 
-    fn __init__(inout self, host_addr: StringLiteral, port: Int) raises -> None:
+    fn __init__(inout self, port: Int, host_addr: StringLiteral = "") raises -> None:
         self.__modules = PyModules()
         self.__port = port
         self.__host_addr = host_addr
@@ -40,9 +40,6 @@ struct HTTPMicro:
 
     fn __print_start[T: Route](self, route: T) raises -> None:
         let fire = "🔥🔥🔥"
-        let endpoint: String = "http://" + str(
-            self.__host_name
-        ) + "/" + self.__port + route.get_endpoint()
         print(fire + " FireApi Micro HTTP Service " + fire + "\n")
         print("listening @ " + self.full_addr() + " ...\n")
 

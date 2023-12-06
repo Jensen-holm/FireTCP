@@ -1,23 +1,12 @@
 from python import PythonObject
 
 
-struct Request:
+@value
+struct Request(Copyable):
     var body: String
-
-    fn __init__(inout self, body: String) -> None:
-        self.body = body
 
     fn is_valid(self) -> Bool:
         return True
-
-    # should only be ran if is_valid() is True
-    fn method(self) -> String:
-        var method: String = ""
-        for i in range(len(self.body)):
-            if not self.body[i]:
-                break
-            method += self.body[i]
-        return method
 
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
         let byte_string = py_builtins.bytes(self.body, "utf-8")

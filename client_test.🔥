@@ -4,7 +4,7 @@ from FireApi import Client, Request, Response
 fn main() raises -> None:
     let client = Client(
         host_name="127.00.1",
-        port=8080,
+        port=9090,
     )
 
     let request = Request(

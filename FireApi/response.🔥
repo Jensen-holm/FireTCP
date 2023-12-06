@@ -6,10 +6,6 @@ struct Response(Copyable):
     var status_code: Int
     var body: String
 
-    fn __init__(inout self, status_code: Int, body: String) -> None:
-        self.status_code = status_code
-        self.body = body
-
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
         return py_builtins.bytes(self.body, "utf-8")
 
@@ -19,3 +15,13 @@ struct Response(Copyable):
             status_code=200,
             body=raw_response,
         )
+    
+    fn log_message(self, execution_time: Float64) -> String:
+        let short_body = self.body if not len(self.body) > 20 else self.body[:20] + "..."
+        return "\t --- response status code: " + str(self.status_code) + "\n" + 
+                "\t --- response body: '" + short_body + "'\n" +
+                "\t --- execution time: " + str(execution_time) + " secs 🔥\n"
+    
+    fn print_log_message(self, execution_time: Float64) -> None:
+        let message = self.log_message(execution_time=execution_time)
+        print(message)

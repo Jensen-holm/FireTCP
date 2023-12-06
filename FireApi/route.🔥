@@ -2,7 +2,8 @@ from FireApi.response import Response
 from FireApi.request import Request
 
 
-trait Route:
+@value
+trait Route(Copyable):
     fn func(self, request: Request) raises -> Response:
         ...
 

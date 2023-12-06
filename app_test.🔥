@@ -1,4 +1,5 @@
-from FireApi import Route, HTTPMicroService, Response, Request
+from FireApi import Route, HTTPMicro, Response, Request
+import time
 
 
 @value
@@ -7,10 +8,12 @@ struct MyRoute(Route):
     var method: String
 
     fn func(self, request: Request) raises -> Response:
-        return Response(
+        let response = Response(
             status_code=200,
             body="You sent: " + request.body,
         )
+        time.sleep(1)
+        return response
 
     fn get_method(self) -> String:
         return self.method
@@ -20,11 +23,14 @@ struct MyRoute(Route):
 
 
 fn main() raises -> None:
-    let app = HTTPMicroService()
+    let service = HTTPMicro(
+        host_addr="",
+        port=9090,
+    )
 
     let main_route = MyRoute(
         endpoint="/",
         method="GET",
     )
 
-    app.run[MyRoute](route=main_route)
+    service.run[MyRoute](route=main_route)

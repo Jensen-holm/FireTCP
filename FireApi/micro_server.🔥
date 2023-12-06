@@ -4,65 +4,75 @@ from FireApi.route import Route
 from FireApi.request import Request
 from FireApi.response import Response
 from FireApi.modules import PyModules
+import time
 
 
-struct HTTPMicroService:
-    var _modules: PyModules
-    var _py_socket: PythonObject
-    var _host_name: PythonObject
-    var _host_addr: StringLiteral
-    var _port: Int
+struct HTTPMicro:
+    var __modules: PyModules
+    var __py_socket: PythonObject
+    var __host_name: PythonObject
+    var __host_addr: StringLiteral
+    var __port: Int
 
-    fn __init__(
-        inout self: Self, host_addr: StringLiteral = "", port: Int = 8080
-    ) raises -> None:
-        self._port = port
-        self._host_addr = host_addr
-        self._modules = PyModules()
+    fn __init__(inout self, host_addr: StringLiteral, port: Int) raises -> None:
+        self.__modules = PyModules()
+        self.__port = port
+        self.__host_addr = host_addr
 
-        self._host_name = self._modules.socket.gethostbyname(
-            self._modules.socket.gethostname(),
+        self.__host_name = self.__modules.socket.gethostbyname(
+            self.__modules.socket.gethostname(),
         )
-        self._py_socket = self._modules.socket.socket(
-            self._modules.socket.AF_INET,
-            self._modules.socket.SOCK_STREAM,
+        self.__py_socket = self.__modules.socket.socket(
+            self.__modules.socket.AF_INET,
+            self.__modules.socket.SOCK_STREAM,
         )
         self.__bind_pySocket()
 
     fn __bind_pySocket(self) raises -> None:
         try:
-            _ = self._py_socket.bind((self._host_addr, self._port))
+            _ = self.__py_socket.bind((self.__host_addr, self.__port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
     # right now we are never using this function and I wonder if that is bad or not ...
     fn __close_socket(self) raises -> None:
-        _ = self._py_socket.close()
+        _ = self.__py_socket.close()
 
-    fn __print_running[T: Route](self, route: T) -> None:
+    fn __print_start[T: Route](self, route: T) raises -> None:
         let fire = "🔥🔥🔥"
-        let endpoint = "http://" + str(
-            self._host_name
-        ) + "/" + self._port + route.get_endpoint()
-        print(fire + "FireApi Micro HTTP Server @ " + endpoint + fire)
+        let endpoint: String = "http://" + str(
+            self.__host_name
+        ) + "/" + self.__port + route.get_endpoint()
+        print(fire + " FireApi Micro HTTP Service " + fire + "\n")
+        print("listening @ " + self.full_addr() + " ...\n")
 
     fn __accept_connection(self) raises -> Connection:
-        let conn_addr = self._py_socket.accept()
-        return Connection(conn_addr=conn_addr, py=self._modules.py)
+        let conn_addr = self.__py_socket.accept()
+        return Connection(conn_addr=conn_addr, py=self.__modules.py)
+
+    fn full_addr(self) raises -> String:
+        return "http://" + str(self.__host_name) + "/" + self.__port
 
     fn run[T: Route](self, route: T, _call: Int = 0) raises -> None:
         if not _call:
-            self.__print_running[T](route=route)
+            self.__print_start[T](route=route)
 
-        _ = self._py_socket.listen()
+        _ = self.__py_socket.listen()
         let connection: Connection = self.__accept_connection()
-        print("connection from:", connection.__str__())
+        connection.print_log_connect_message()
         while True:
+            let st: Float64 = time.now()
             let response: Response = self.__handle_request[T](
                 route=route, connection=connection, _call=_call
             )
             _ = connection.send_response(response)
             connection.close()
+            let et: Float64 = time.now()
+
+            # print additional response information
+            response.print_log_message(execution_time=(et - st) / 1e9)
+
+            # go back to listening for requests
             self.run[T](route=route, _call=_call + 1)
 
     fn __handle_request[

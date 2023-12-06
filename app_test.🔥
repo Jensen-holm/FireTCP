@@ -11,6 +11,7 @@ struct MyRoute(Route):
             status_code=200,
             body="You sent: " + request.body,
         )
+        time.sleep(1)
         return response
 
     fn get_method(self) -> String:

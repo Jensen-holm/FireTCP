@@ -10,16 +10,22 @@ import time
 struct HTTPMicro:
     var __modules: PyModules
     var __py_socket: PythonObject
-    var __host_name: PythonObject
-    var __host_addr: StringLiteral
-    var __port: Int
+    var host_name: PythonObject
+    var host_addr: StringLiteral
+    var port: Int
+    var avg_et: Float64
+    var total_et: Float64
+    var total_requests: Int
 
     fn __init__(inout self, port: Int, host_addr: StringLiteral = "") raises -> None:
-        self.__modules = PyModules()
-        self.__port = port
-        self.__host_addr = host_addr
+        self.port = port
+        self.host_addr = host_addr
+        self.total_requests = 0
+        self.total_et = 0
+        self.avg_et = 0
 
-        self.__host_name = self.__modules.socket.gethostbyname(
+        self.__modules = PyModules()
+        self.host_name = self.__modules.socket.gethostbyname(
             self.__modules.socket.gethostname(),
         )
         self.__py_socket = self.__modules.socket.socket(
@@ -30,7 +36,7 @@ struct HTTPMicro:
 
     fn __bind_pySocket(self) raises -> None:
         try:
-            _ = self.__py_socket.bind((self.__host_addr, self.__port))
+            _ = self.__py_socket.bind((self.host_addr, self.port))
         except Exception:
             raise Error("error binding pysocket to hostAddr & port")
 
@@ -41,45 +47,59 @@ struct HTTPMicro:
     fn __print_start[T: Route](self, route: T) raises -> None:
         let fire = "🔥🔥🔥"
         print(fire + " FireApi Micro HTTP Service " + fire + "\n")
-        print("listening @ " + self.full_addr() + " ...\n")
+        print("listening @ " + self.full_addr[T](route) + " ...\n")
 
     fn __accept_connection(self) raises -> Connection:
         let conn_addr = self.__py_socket.accept()
         return Connection(conn_addr=conn_addr, py=self.__modules.py)
 
-    fn full_addr(self) raises -> String:
-        return "http://" + str(self.__host_name) + "/" + self.__port
+    fn full_addr[T: Route](self, route: T) raises -> String:
+        return "http://" 
+            + str(self.host_name) 
+            + "/" + self.port 
+            + route.get_endpoint()
+        
+    fn __update_metrics(inout self, et: Float64) -> None:
+        self.total_requests += 1
+        self.total_et += et
+        self.avg_et = self.total_et / self.total_requests
 
-    fn run[T: Route](self, route: T, _call: Int = 0) raises -> None:
+    fn run[T: Route](inout self, route: T, _call: Int = 0) raises -> None:
         if not _call:
             self.__print_start[T](route=route)
 
         _ = self.__py_socket.listen()
         let connection: Connection = self.__accept_connection()
         connection.print_log_connect_message()
-        while True:
-            let st: Float64 = time.now()
-            let response: Response = self.__handle_request[T](
-                route=route, connection=connection, _call=_call
-            )
-            _ = connection.send_response(response)
-            connection.close()
-            let et: Float64 = time.now()
 
-            # print additional response information
-            response.print_log_message(execution_time=(et - st) / 1e9)
+        let raw_request = connection.recieve_data()
+        let st: Float64 = time.now()
+        let response: Response = self.__handle_request[T](
+            route=route, connection=connection, _call=_call,
+            raw_request=raw_request,
+        )
+        _ = connection.send_response(response)
+        connection.close()
 
-            # go back to listening for requests
-            self.run[T](route=route, _call=_call + 1)
+        # print additional response information
+        let execution_time: Float64 = (time.now() - st) / 1e9
+        self.__update_metrics(et=execution_time)
+        response.print_log_message(
+            execution_time=execution_time, 
+            raw_request=raw_request,
+            symbol="🔥" if (execution_time <= self.avg_et) else "🥶"
+        )
+
+        # go back to listening for requests
+        self.run[T](route=route, _call=_call + 1)
 
     fn __handle_request[
         T: Route
-    ](self, route: T, connection: Connection, _call: Int) raises -> Response:
-        let request_str = connection.recieve_data(size=1024)
-        if not request_str:
+    ](self, route: T, raw_request: String, connection: Connection, _call: Int) raises -> Response:
+        if not raw_request:
             return Response.empty_request_error()
 
-        let request = Request.from_raw(request_str)
+        let request = Request.from_raw(raw_request)
         if not request.is_valid():
             return Response.malformed_request_error()
 

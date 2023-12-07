@@ -1,0 +1,50 @@
+from FireApi import HTTPMicro, Route, Request, Response
+
+
+fn kth_fibonacci(k: Int) raises -> Int:
+    if k <= 0:
+        let message = "invalid input to the kth_fib() function: '" + str(k) + "'"
+        raise Error(message)
+    if k == 1 or k == 2:
+        return k - 1
+    return kth_fibonacci(k - 1) + kth_fibonacci(k - 2)
+
+
+@value
+struct kthFib(Route):
+    var endpoint: String
+    var method: String
+
+    fn get_method(self) -> String:
+        return self.method
+
+    fn get_endpoint(self) -> String:
+        return self.endpoint
+
+    fn func(self, req: Request) raises -> Response:
+        try:
+            let k: Int = atol(req.body)
+            let result: Int = kth_fibonacci(k=k)
+            return Response.success(
+                body=str(result),
+            )
+
+        except Error:
+            return Response(
+                status_code=400,
+                body="error while attempting to convert "
+                + "request body into string: '"
+                + str(Error)
+                + "'",
+            )
+
+
+fn main() raises -> None:
+    var service = HTTPMicro(port=9090)
+
+    let fib_route = kthFib(
+        endpoint="/kth_fibonacci",
+        method="GET",
+    )
+
+    service.run[kthFib](route=fib_route)

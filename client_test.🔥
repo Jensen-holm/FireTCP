@@ -10,7 +10,7 @@ fn main() raises -> None:
     )
 
     random.seed(1)
-    let num = random.random_si64(min=20, max=50)
+    let num = random.random_si64(min=5, max=100)
     let req = Request(
         body=str(num),
         method="GET",

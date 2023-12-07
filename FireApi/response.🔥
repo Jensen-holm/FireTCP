@@ -25,3 +25,17 @@ struct Response(Copyable):
     fn print_log_message(self, execution_time: Float64) -> None:
         let message = self.log_message(execution_time=execution_time)
         print(message)
+    
+    # default responses to save the user from writing
+    # boiler plate error responses that are trivial
+    @staticmethod
+    fn success(body: String) -> Self:
+        return Self(status_code=200, body=body)
+    
+    @staticmethod
+    fn empty_request_error(body: String = "Invalid Request: request was empty.") -> Self:
+        return Self(status_code=400, body=body)
+    
+    @staticmethod
+    fn malformed_request_error(body: String = "Invalid Request: malformed request.") -> Self:
+        return Self(status_code=400, body=body)

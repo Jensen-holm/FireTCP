@@ -77,17 +77,11 @@ struct HTTPMicro:
     ](self, route: T, connection: Connection, _call: Int) raises -> Response:
         let request_str = connection.recieve_data(size=1024)
         if not request_str:
-            return Response(
-                status_code=400,
-                body="invalid request. Server was unable to recieve data.",
-            )
+            return Response.empty_request_error()
 
         let request = Request.from_raw(request_str)
         if not request.is_valid():
-            return Response(
-                status_code=400,
-                body="invalid request. client request was deemed invalid.",
-            )
+            return Response.malformed_request_error()
 
-        let response: Response = route.func(request=request)
+        let response = route.func(request=request)
         return response

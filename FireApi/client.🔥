@@ -18,7 +18,7 @@ struct Client:
         self._host_name = host_name
         self._port = port
         self.endpoint = endpoint
-
+    
     fn send_request(self, request: Request) raises -> Response:
         _ = self._client_socket.connect((self._host_name, self._port))
         let request_bytes = request.to_bytes(

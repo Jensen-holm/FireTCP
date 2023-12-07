@@ -1,0 +1,43 @@
+from FireApi import HTTPMicro, Route, Request, Response
+
+
+fn kth_fib(k: Int) -> String:
+    if k <= 1:
+        return k
+    return kth_fib(k - 1) + kth_fib(k - 2)
+
+
+@value
+struct Fibonnaci(Route):
+    var endpoint: String
+    var method: String
+
+    fn func(self, req: Request) raises -> Response:
+        # compute the last value in the fibonacci
+        # sequence for the given integer
+        try:
+            let k = atol(req.body)
+            let kth = kth_fib(k)
+            return Response.success(
+                body=str(kth),
+            )
+
+        except Error:
+            return Response(
+                status_code=400,
+                body="error while attempting to convert "
+                + "request body into string: '"
+                + str(Error)
+                + "'"
+            )
+
+
+fn main() raises -> None:
+    let service = HTTPMicro(port=9090)
+
+    let fib_route = Fibonnaci(
+        endpoint="/fibonacci",
+        method="GET",
+    )
+
+    service.run[Fibonnaci](route=fib_route)

@@ -29,10 +29,7 @@ struct HTTPMicro:
         self.__bind_pySocket()
 
     fn __bind_pySocket(self) raises -> None:
-        try:
-            _ = self.__py_socket.bind((self.__host_addr, self.__port))
-        except Exception:
-            raise Error("error binding pysocket to hostAddr & port")
+        _ = self.__py_socket.bind((self.__host_addr, self.__port))
 
     # right now we are never using this function and I wonder if that is bad or not ...
     fn __close_socket(self) raises -> None:
@@ -49,7 +46,7 @@ struct HTTPMicro:
 
     fn full_addr(self) raises -> String:
         return "http://" + str(self.__host_name) + "/" + self.__port
-
+    
     fn run[T: Route](self, route: T, _call: Int = 0) raises -> None:
         if not _call:
             self.__print_start[T](route=route)
@@ -57,20 +54,20 @@ struct HTTPMicro:
         _ = self.__py_socket.listen()
         let connection: Connection = self.__accept_connection()
         connection.print_log_connect_message()
-        while True:
-            let st: Float64 = time.now()
-            let response: Response = self.__handle_request[T](
-                route=route, connection=connection, _call=_call
-            )
-            _ = connection.send_response(response)
-            connection.close()
-            let et: Float64 = time.now()
 
-            # print additional response information
-            response.print_log_message(execution_time=(et - st) / 1e9)
+        let st: Float64 = time.now()
+        let response: Response = self.__handle_request[T](
+            route=route, connection=connection, _call=_call
+        )
+        _ = connection.send_response(response)
+        connection.close()
+        let et: Float64 = time.now()
 
-            # go back to listening for requests
-            self.run[T](route=route, _call=_call + 1)
+        # print additional response information
+        response.print_log_message(execution_time=(et - st) / 1e9)
+
+        # go back to listening for requests
+        self.run[T](route=route, _call=_call + 1)
 
     fn __handle_request[
         T: Route

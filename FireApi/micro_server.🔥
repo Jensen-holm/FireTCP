@@ -28,21 +28,22 @@ struct HTTPMicro:
         self.host_name = self.__modules.socket.gethostbyname(
             self.__modules.socket.gethostname(),
         )
+
+        self.__py_socket = None
+        self.__spinup_socket()
+        self.__bind_pySocket()
+
+    fn __bind_pySocket(self) raises -> None:
+        _ = self.__py_socket.bind((self.host_addr, self.port))
+
+    fn __close_socket(self) raises -> None:
+        _ = self.__py_socket.close()
+
+    fn __spinup_socket(inout self) raises -> None:
         self.__py_socket = self.__modules.socket.socket(
             self.__modules.socket.AF_INET,
             self.__modules.socket.SOCK_STREAM,
         )
-        self.__bind_pySocket()
-
-    fn __bind_pySocket(self) raises -> None:
-        try:
-            _ = self.__py_socket.bind((self.host_addr, self.port))
-        except Exception:
-            raise Error("error binding pysocket to hostAddr & port")
-
-    # right now we are never using this function and I wonder if that is bad or not ...
-    fn __close_socket(self) raises -> None:
-        _ = self.__py_socket.close()
 
     fn __print_start[T: Route](self, route: T) raises -> None:
         let fire = "🔥🔥🔥"

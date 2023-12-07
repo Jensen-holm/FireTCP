@@ -6,7 +6,7 @@ fn main() raises -> None:
     let client = Client(
         host_name="127.0.0.1",
         port=9090,
-        endpoint="/fibonnaci",
+        endpoint="/kth_fibonnaci",
     )
 
     random.seed(1)

@@ -6,8 +6,8 @@ from FireApi.request import Request
 struct Client:
     var _modules: PyModules
     var _client_socket: PythonObject
-    var _host_name: StringLiteral
-    var _port: Int
+    var host_name: StringLiteral
+    var port: Int
     var endpoint: String
 
     fn __init__(
@@ -15,12 +15,12 @@ struct Client:
     ) raises -> None:
         self._modules = PyModules()
         self._client_socket = self._modules.socket.socket()
-        self._host_name = host_name
-        self._port = port
+        self.host_name = host_name
+        self.port = port
         self.endpoint = endpoint
 
     fn send_request(self, request: Request) raises -> Response:
-        _ = self._client_socket.connect((self._host_name, self._port))
+        _ = self._client_socket.connect((self.host_name, self.port))
         let request_bytes = request.to_bytes(
             py_builtins=self._modules.py,
         )

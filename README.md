@@ -11,7 +11,7 @@ FireApi is an HTTP API for the AI programming language [mojo]()
 ### Hello FireApi
 Step 1: `$ mkdir hello_fire_api && cd hello_fire_api` <br>
 Step 2: `$ curl -sS https://raw.githubusercontent.com/Jensen-holm/FireApi/main/install.sh | bash`
-Step 3: Once you have made a project and cloned the FireApi you can get coding! Check out the example in examples/hello_fireapi.🔥
+Step 3: Once you have made a project and cloned the FireApi you can get coding! Bellow is the hello world.
 
 
 ### HTTP Micro Service Hello World
@@ -59,7 +59,7 @@ from FireApi import Client, Request, Response
 
 fn main() raises -> None:
     let client = Client(
-        host_name="127.00.1",
+        host_name="127.0.0.1",
         port=9090,
         endpoint="/index",
     )

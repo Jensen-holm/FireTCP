@@ -10,30 +10,33 @@ import time
 struct HTTPMicro:
     var __modules: PyModules
     var __py_socket: PythonObject
-    var __host_name: PythonObject
-    var __host_addr: StringLiteral
-    var __port: Int
+    var host_name: PythonObject
+    var host_addr: StringLiteral
+    var port: Int
 
     fn __init__(inout self, port: Int, host_addr: StringLiteral = "") raises -> None:
         self.__modules = PyModules()
-        self.__port = port
-        self.__host_addr = host_addr
-
-        self.__host_name = self.__modules.socket.gethostbyname(
+        self.port = port
+        self.host_addr = host_addr
+        self.host_name = self.__modules.socket.gethostbyname(
             self.__modules.socket.gethostname(),
         )
+
+        self.__py_socket = None
+        self.__spinup_socket()
+        self.__bind_pySocket()
+
+    fn __bind_pySocket(self) raises -> None:
+        _ = self.__py_socket.bind((self.host_addr, self.port))
+
+    fn __close_socket(self) raises -> None:
+        _ = self.__py_socket.close()
+
+    fn __spinup_socket(inout self) raises -> None:
         self.__py_socket = self.__modules.socket.socket(
             self.__modules.socket.AF_INET,
             self.__modules.socket.SOCK_STREAM,
         )
-        self.__bind_pySocket()
-
-    fn __bind_pySocket(self) raises -> None:
-        _ = self.__py_socket.bind((self.__host_addr, self.__port))
-
-    # right now we are never using this function and I wonder if that is bad or not ...
-    fn __close_socket(self) raises -> None:
-        _ = self.__py_socket.close()
 
     fn __print_start[T: Route](self, route: T) raises -> None:
         let fire = "🔥🔥🔥"
@@ -45,9 +48,9 @@ struct HTTPMicro:
         return Connection(conn_addr=conn_addr, py=self.__modules.py)
 
     fn full_addr(self) raises -> String:
-        return "http://" + str(self.__host_name) + "/" + self.__port
-    
-    fn run[T: Route](self, route: T, _call: Int = 0) raises -> None:
+        return "http://" + str(self.host_name) + "/" + self.port
+
+    fn run[T: Route](inout self, route: T, _call: Int = 0) raises -> None:
         if not _call:
             self.__print_start[T](route=route)
 

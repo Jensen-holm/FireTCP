@@ -21,7 +21,7 @@ struct MyRoute(Route):
 
 
 fn main() raises -> None:
-    let service = HTTPMicro(port=8080)
+    var service = HTTPMicro(port=8080)
 
     let main_route = MyRoute(
         endpoint="/index",
@@ -29,4 +29,3 @@ fn main() raises -> None:
     )
 
     service.run[MyRoute](route=main_route)
-

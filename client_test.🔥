@@ -17,4 +17,3 @@ fn main() raises -> None:
     )
 
     print(response.body)
-

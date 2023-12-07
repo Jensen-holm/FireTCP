@@ -16,12 +16,41 @@ struct Response(Copyable):
             body=raw_response,
         )
     
-    fn log_message(self, execution_time: Float64) -> String:
+    fn log_message(self, execution_time: Float64, raw_request: String, symbol: String = "") -> String:
         let short_body = self.body if not len(self.body) > 20 else self.body[:20] + "..."
-        return "\t --- response status code: " + str(self.status_code) + "\n" + 
-                "\t --- response body: '" + short_body + "'\n" +
-                "\t --- execution time: " + str(execution_time) + " secs 🔥\n"
+        let short_input = raw_request if not len(raw_request) > 20 else raw_request[:20] + "..."
+        return "\t--- response status code: " + str(self.status_code) + "\n\t" 
+                + "--- raw request body: '" + short_input + "'\n\t"
+                + "--- response body: '" + short_body + "'\n\t"
+                + "--- execution time: " + str(execution_time) + " secs " + symbol
     
-    fn print_log_message(self, execution_time: Float64) -> None:
-        let message = self.log_message(execution_time=execution_time)
+    fn print_log_message(self, execution_time: Float64, raw_request: String, symbol: String) -> None:
+        let message = self.log_message(
+            execution_time=execution_time, 
+            raw_request=raw_request,
+            symbol=symbol,
+        )
         print(message)
+    
+    # default responses to save the user from writing
+    # boiler plate error responses that are trivial
+    @staticmethod
+    fn success(body: String) -> Self:
+        return Self(
+            status_code=200, 
+            body=body,
+        )
+    
+    @staticmethod
+    fn empty_request_error(body: String = "Invalid Request: request was empty.") -> Self:
+        return Self(
+            status_code=400, 
+            body=body,
+        )
+    
+    @staticmethod
+    fn malformed_request_error(body: String = "Invalid Request: malformed request.") -> Self:
+        return Self(
+            status_code=400, 
+            body=body,
+        )

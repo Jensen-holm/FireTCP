@@ -7,8 +7,8 @@ trait Route(Copyable):
     fn func(self, request: Request) raises -> Response:
         ...
 
-    fn get_method(self) -> String:
+    fn get_endpoint(self) -> String:
         ...
 
-    fn get_endpoint(self) -> String:
+    fn get_method(self) -> String:
         ...

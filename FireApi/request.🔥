@@ -4,16 +4,35 @@ from python import PythonObject
 @value
 struct Request(Copyable):
     var body: String
+    var method: String
+
+    fn __init__(inout self, body: String, method: String) raises -> None:
+        _ = self.is_valid_method(method)
+        self.method = method
+        self.body = body
 
     fn is_valid(self) -> Bool:
         return True
+
+    @staticmethod
+    fn is_valid_method(method: String) raises -> Bool:
+        if method == "GET" or method == "POST":
+            return True
+        raise Error(
+            "invalid method '"
+            + method
+            + "'. FireApi currently only supports GET & POST"
+        )
 
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
         let byte_string = py_builtins.bytes(self.body, "utf-8")
         return byte_string
 
     @staticmethod
-    fn from_raw(raw_request: String) -> Request:
+    fn from_raw(raw_request: String) raises -> Request:
+        # we will want to change this later to actually parse raw http reqeusts
+        let method = "GET"
         return Request(
             body=raw_request,
+            method=method,
         )

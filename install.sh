@@ -41,5 +41,5 @@ print_done
 
 rm -rf FireApi
 
-echo -e "${FIRE}${FIRE}${GREEN} FireApi Installed Successfully ${RESET}${FIRE}${FIRE}\n"
+echo -e "${FIRE}${FIRE}${GREEN} FireApi Installed Successfully ${RESET}${FIRE}${FIRE}"
 

@@ -5,19 +5,19 @@ from FireApi.response import Response
 struct Connection:
     var conn: PythonObject
     var addr: PythonObject
-    var _py: PythonObject
+    var __py: PythonObject
 
     fn __init__(inout self, conn_addr: PythonObject, py: PythonObject) raises -> None:
         self.conn = conn_addr[0]
         self.addr = conn_addr[1]
-        self._py = py
+        self.__py = py
 
     fn recieve_data(self, size: Int = 1024) raises -> String:
         let data = self.conn.recv(size).decode("utf-8")
         return str(data)
 
     fn send_response(self, response: Response) raises -> None:
-        let response_bytes = response.to_bytes(py_builtins=self._py)
+        let response_bytes = response.to_bytes(py_builtins=self.__py)
         _ = self.conn.sendall(response_bytes)
 
     fn close(self) raises -> None:
@@ -31,3 +31,4 @@ struct Connection:
     fn print_log_connect_message(self) raises -> None:
         let message = self.log_connect_message()
         print(message)
+

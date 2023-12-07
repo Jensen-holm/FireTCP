@@ -1,0 +1,31 @@
+from FireApi import Route, HTTPMicro, Response, Request
+
+
+@value
+struct MyRoute(Route):
+    var endpoint: String
+    var method: String
+
+    fn func(self, request: Request) raises -> Response:
+        let response = Response(
+            status_code=200,
+            body="You sent: " + request.body,
+        )
+        return response
+
+    fn get_method(self) -> String:
+        return self.method
+
+    fn get_endpoint(self) -> String:
+        return self.endpoint
+
+
+fn main() raises -> None:
+    var service = HTTPMicro(port=8080)
+
+    let main_route = MyRoute(
+        endpoint="/index",
+        method="GET",
+    )
+
+    service.run[MyRoute](route=main_route)

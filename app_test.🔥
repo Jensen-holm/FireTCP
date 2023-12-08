@@ -1,4 +1,4 @@
-from FireApi import HTTPMicro, Route, Request, Response
+from FireApi import HTTPLite, Route, Request, Response
 
 
 fn kth_fibonacci(k: Int) raises -> Int:
@@ -40,7 +40,7 @@ struct kthFib(Route):
 
 
 fn main() raises -> None:
-    var service = HTTPMicro(port=9090)
+    var service = HTTPLite(port=9090)
 
     let fib_route = kthFib(
         endpoint="/kth_fibonacci",
@@ -48,4 +48,3 @@ fn main() raises -> None:
     )
 
     service.run[kthFib](route=fib_route)
-

@@ -1,39 +1,37 @@
-from python import Python, PythonObject
 from FireApi.connection import Connection
 from FireApi.route import Route
 from FireApi.request import Request
 from FireApi.response import Response
 from FireApi.modules import PyModules
+from FireApi.server_stats import HTTPLiteStats
+
+from python import Python, PythonObject
 import time
 
 
-struct HTTPMicro:
+struct HTTPLite:
+    """'Lite' wrapper for the python socket library with HTTP protocol."""
     var __modules: PyModules
     var __py_socket: PythonObject
     var host_name: PythonObject
     var host_addr: StringLiteral
     var port: Int
-    var avg_et: Float64
-    var total_et: Float64
-    var total_requests: Int
+    var stats: HTTPLiteStats
 
     fn __init__(inout self, port: Int, host_addr: StringLiteral = "") raises -> None:
         self.port = port
         self.host_addr = host_addr
-        self.total_requests = 0
-        self.total_et = 0
-        self.avg_et = 0
-
+        self.stats = HTTPLiteStats()
         self.__modules = PyModules()
         self.host_name = self.__modules.socket.gethostbyname(
             self.__modules.socket.gethostname(),
         )
-
         self.__py_socket = None
         self.__spinup_socket()
         self.__bind_pySocket()
 
     fn __bind_pySocket(self) raises -> None:
+        """Private funciton that binds the initialized python socket to the given host and port. this runs in __init__()"""
         _ = self.__py_socket.bind((self.host_addr, self.port))
 
     fn __close_socket(self) raises -> None:
@@ -47,7 +45,7 @@ struct HTTPMicro:
 
     fn __print_start[T: Route](self, route: T) raises -> None:
         let fire = "🔥🔥🔥"
-        print(fire + " FireApi Micro HTTP Service " + fire + "\n")
+        print(fire + " FireApi HTTPLite Service " + fire + "\n")
         print("listening @ " + self.full_addr[T](route) + " ...\n")
 
     fn __accept_connection(self) raises -> Connection:
@@ -55,17 +53,18 @@ struct HTTPMicro:
         return Connection(conn_addr=conn_addr, py=self.__modules.py)
 
     fn full_addr[T: Route](self, route: T) raises -> String:
+        """Returns full address of the HTTPLite server including the routes' endpoint."""
         return "http://" 
             + str(self.host_name) 
             + "/" + self.port 
             + route.get_endpoint()
         
     fn __update_metrics(inout self, et: Float64) -> None:
-        self.total_requests += 1
-        self.total_et += et
-        self.avg_et = self.total_et / self.total_requests
+        """Private function that updates the metrics that enhance logging output."""
+        self.stats.update(execution_time=et)
 
     fn run[T: Route](inout self, route: T, _call: Int = 0) raises -> None:
+        """Main funciton that the user calls to begin hosting the HTTPLite server."""
         if not _call:
             self.__print_start[T](route=route)
 
@@ -79,16 +78,17 @@ struct HTTPMicro:
             route=route, connection=connection, _call=_call,
             raw_request=raw_request,
         )
-        _ = connection.send_response(response)
+
+        connection.send_response(response)
         connection.close()
 
         # print additional response information
-        let execution_time: Float64 = (time.now() - st) / 1e9
+        let execution_time: Float64 = (time.now() - st)
         self.__update_metrics(et=execution_time)
         response.print_log_message(
-            execution_time=execution_time, 
+            execution_time=self.stats.most_recent_secs(), 
             raw_request=raw_request,
-            symbol="🔥" if (execution_time <= self.avg_et) else "🥶"
+            symbol="🔥" if (execution_time <= self.stats.average_execution_time) else "🥶"
         )
 
         # go back to listening for requests
@@ -97,6 +97,7 @@ struct HTTPMicro:
     fn __handle_request[
         T: Route
     ](self, route: T, raw_request: String, connection: Connection, _call: Int) raises -> Response:
+        """Private function that makes generates a Response object given a Request object."""
         if not raw_request:
             return Response.empty_request_error()
 

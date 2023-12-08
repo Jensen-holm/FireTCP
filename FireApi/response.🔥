@@ -1,4 +1,5 @@
 from python import PythonObject
+from FireApi.server_stats import HTTPLiteStats
 
 
 @value

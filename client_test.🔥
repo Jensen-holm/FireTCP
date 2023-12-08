@@ -1,20 +1,33 @@
 from FireApi import Client, Response, Request
+from sys import argv
 import random
 
 
+fn get_k() raises -> Int:
+    let args = argv()
+    if len(args) < 2:
+        raise Error("enter a number for k")
+    let inp = args[1]
+    try:
+        let k: Int = atol(inp)
+        return k
+    except Error:
+        raise Error
+
+    
 fn main() raises -> None:
+    let k: Int = get_k()
+
     let client = Client(
         host_name="127.0.0.1",
         port=9090,
         endpoint="/kth_fibonnaci",
     )
 
-    random.seed(1)
-    let num = random.random_si64(min=5, max=100)
     let req = Request(
-        body=str(num),
+        body=str(k),
         method="GET",
     )
 
     let resp = client.send_request(request=req)
-    print(resp.body)
+    print(str(k) + "th fibonacci = " + resp.body)

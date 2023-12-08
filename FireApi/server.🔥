@@ -1,26 +1,27 @@
 from FireApi.connection import Connection
-from FireApi.route import Route
+from FireApi.service import Service
 from FireApi.request import Request
 from FireApi.response import Response
 from FireApi.modules import PyModules
 from FireApi.server_stats import HTTPLiteStats
-
 from python import Python, PythonObject
 import time
 
 
-struct HTTPLite:
+struct HTTPLite[S: Service]:
     """'Lite' wrapper for the python socket library with HTTP protocol."""
     var __modules: PyModules
     var __py_socket: PythonObject
     var host_name: PythonObject
     var host_addr: StringLiteral
+    var service: S
     var port: Int
     var stats: HTTPLiteStats
 
-    fn __init__(inout self, port: Int, host_addr: StringLiteral = "") raises -> None:
+    fn __init__(inout self, service: S, port: Int, host_addr: StringLiteral) raises -> None:
         self.port = port
         self.host_addr = host_addr
+        self.service = service
         self.stats = HTTPLiteStats()
         self.__modules = PyModules()
         self.host_name = self.__modules.socket.gethostbyname(
@@ -30,53 +31,59 @@ struct HTTPLite:
         self.__spinup_socket()
         self.__bind_pySocket()
 
+    @always_inline
     fn __bind_pySocket(self) raises -> None:
         """Private funciton that binds the initialized python socket to the given host and port. this runs in __init__()"""
         _ = self.__py_socket.bind((self.host_addr, self.port))
 
+    @always_inline
     fn __close_socket(self) raises -> None:
         _ = self.__py_socket.close()
 
+    @always_inline
     fn __spinup_socket(inout self) raises -> None:
         self.__py_socket = self.__modules.socket.socket(
             self.__modules.socket.AF_INET,
             self.__modules.socket.SOCK_STREAM,
         )
 
-    fn __print_start[T: Route](self, route: T) raises -> None:
+    @always_inline
+    fn __print_start(self) raises -> None:
         let fire = "🔥🔥🔥"
         print(fire + " FireApi HTTPLite Service " + fire + "\n")
-        print("listening @ " + self.full_addr[T](route) + " ...\n")
+        print("listening @ " + self.full_addr() + " ...\n")
 
+    @always_inline
     fn __accept_connection(self) raises -> Connection:
         let conn_addr = self.__py_socket.accept()
         return Connection(conn_addr=conn_addr, py=self.__modules.py)
 
-    fn full_addr[T: Route](self, route: T) raises -> String:
+    @always_inline
+    fn full_addr(self) raises -> String:
         """Returns full address of the HTTPLite server including the routes' endpoint."""
         return "http://" 
-            + str(self.host_name) 
+            + str(self.host_addr) 
             + "/" + self.port 
-            + route.get_endpoint()
+            + self.service.get_endpoint()
         
+    @always_inline
     fn __update_metrics(inout self, et: Float64) -> None:
         """Private function that updates the metrics that enhance logging output."""
         self.stats.update(execution_time=et)
 
-    fn run[T: Route](inout self, route: T, _call: Int = 0) raises -> None:
+    fn run(inout self) raises -> None:
         """Main funciton that the user calls to begin hosting the HTTPLite server."""
-        if not _call:
-            self.__print_start[T](route=route)
+        if not self.stats.total_requests:
+            self.__print_start()
 
         _ = self.__py_socket.listen()
         let connection: Connection = self.__accept_connection()
         connection.print_log_connect_message()
 
-        let raw_request = connection.recieve_data()
         let st: Float64 = time.now()
-        let response: Response = self.__handle_request[T](
-            route=route, connection=connection, _call=_call,
-            raw_request=raw_request,
+        let raw_request = connection.recieve_data()
+        let response: Response = self.__handle_request(
+            connection=connection, raw_request=raw_request,
         )
 
         connection.send_response(response)
@@ -91,12 +98,10 @@ struct HTTPLite:
             symbol="🔥" if (execution_time <= self.stats.average_execution_time) else "🥶"
         )
 
-        # go back to listening for requests
-        self.run[T](route=route, _call=_call + 1)
+        # go back to listening for requests 
+        self.run()
 
-    fn __handle_request[
-        T: Route
-    ](self, route: T, raw_request: String, connection: Connection, _call: Int) raises -> Response:
+    fn __handle_request(self, raw_request: String, connection: Connection) raises -> Response:
         """Private function that makes generates a Response object given a Request object."""
         if not raw_request:
             return Response.empty_request_error()
@@ -104,6 +109,9 @@ struct HTTPLite:
         let request = Request.from_raw(raw_request)
         if not request.is_valid():
             return Response.malformed_request_error()
+        
+        if self.service.get_method() != request.method:
+            return Response.wrong_method_error(method=request.method)
 
-        let response = route.func(request=request)
+        let response = self.service.func(req=request)
         return response

@@ -8,11 +8,8 @@ fn get_k() raises -> Int:
     if len(args) < 2:
         raise Error("enter a number for k")
     let inp = args[1]
-    try:
-        let k: Int = atol(inp)
-        return k
-    except Error:
-        raise Error
+    let k: Int = atol(inp)
+    return k
 
     
 fn main() raises -> None:

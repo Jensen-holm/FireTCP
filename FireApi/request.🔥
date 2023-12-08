@@ -29,7 +29,7 @@ struct Request(Copyable):
         return byte_string
 
     @staticmethod
-    fn from_raw(raw_request: String) raises -> Request:
+    fn from_raw(raw_request: String) raises -> Self:
         # we will want to change this later to actually parse raw http reqeusts
         let method = "GET"
         return Request(

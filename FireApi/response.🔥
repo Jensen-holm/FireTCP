@@ -7,8 +7,8 @@ struct Response(Copyable):
     var status_code: Int
     var body: String
 
-    fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
-        return py_builtins.bytes(self.body, "utf-8")
+    fn to_bytes(self, py_builtins: PythonObject, encoding: StringLiteral = "utf-8") raises -> PythonObject:
+        return py_builtins.bytes(self.body, encoding)
 
     @staticmethod
     fn from_raw(raw_response: String) -> Self:
@@ -53,5 +53,13 @@ struct Response(Copyable):
     fn malformed_request_error(body: String = "Invalid Request: malformed request.") -> Self:
         return Self(
             status_code=400, 
+            body=body,
+        )
+    
+    @staticmethod
+    fn wrong_method_error(method: String) -> Self:
+        let body = "Bad Request: bad request method '" + method + "'" 
+        return Self(
+            status_code=404,
             body=body,
         )

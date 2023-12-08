@@ -11,7 +11,7 @@ fn get_k() raises -> Int:
     let k: Int = atol(inp)
     return k
 
-    
+
 fn main() raises -> None:
     let k: Int = get_k()
 

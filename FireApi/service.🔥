@@ -3,8 +3,8 @@ from FireApi.request import Request
 
 
 @value
-trait Route(Copyable):
-    fn func(self, request: Request) raises -> Response:
+trait Service(Copyable):
+    fn func(self, req: Request) raises -> Response:
         ...
 
     fn get_endpoint(self) -> String:

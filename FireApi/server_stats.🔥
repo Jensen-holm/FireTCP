@@ -24,15 +24,15 @@ struct HTTPLiteStats:
         self.update_total_et(et=execution_time)
         self.update_average_et()
         self.most_recent_et = execution_time
-    
+
     fn avg_seconds(self) -> Float64:
         return self.average_execution_time / 1e9
 
     fn tot_seconds(self) -> Float64:
         return self.total_execution_time / 1e9
-    
+
     fn most_recent_secs(self) -> Float64:
         return self.most_recent_et / 1e9
-    
+
     fn most_recent_ms(self) -> Float64:
         return self.most_recent_et

@@ -4,7 +4,6 @@ from FireApi.request import Request
 from FireApi.response import Response
 from FireApi.modules import PyModules
 from FireApi.server_stats import HTTPLiteStats
-
 from python import Python, PythonObject
 import time
 
@@ -19,7 +18,7 @@ struct HTTPLite[S: Service]:
     var port: Int
     var stats: HTTPLiteStats
 
-    fn __init__(inout self, port: Int, service: S, host_addr: StringLiteral = "") raises -> None:
+    fn __init__(inout self, service: S, port: Int, host_addr: StringLiteral) raises -> None:
         self.port = port
         self.host_addr = host_addr
         self.service = service
@@ -32,35 +31,42 @@ struct HTTPLite[S: Service]:
         self.__spinup_socket()
         self.__bind_pySocket()
 
+    @always_inline
     fn __bind_pySocket(self) raises -> None:
         """Private funciton that binds the initialized python socket to the given host and port. this runs in __init__()"""
         _ = self.__py_socket.bind((self.host_addr, self.port))
 
+    @always_inline
     fn __close_socket(self) raises -> None:
         _ = self.__py_socket.close()
 
+    @always_inline
     fn __spinup_socket(inout self) raises -> None:
         self.__py_socket = self.__modules.socket.socket(
             self.__modules.socket.AF_INET,
             self.__modules.socket.SOCK_STREAM,
         )
 
+    @always_inline
     fn __print_start(self) raises -> None:
         let fire = "🔥🔥🔥"
         print(fire + " FireApi HTTPLite Service " + fire + "\n")
         print("listening @ " + self.full_addr() + " ...\n")
 
+    @always_inline
     fn __accept_connection(self) raises -> Connection:
         let conn_addr = self.__py_socket.accept()
         return Connection(conn_addr=conn_addr, py=self.__modules.py)
 
+    @always_inline
     fn full_addr(self) raises -> String:
         """Returns full address of the HTTPLite server including the routes' endpoint."""
         return "http://" 
-            + str(self.host_name) 
+            + str(self.host_addr) 
             + "/" + self.port 
             + self.service.get_endpoint()
         
+    @always_inline
     fn __update_metrics(inout self, et: Float64) -> None:
         """Private function that updates the metrics that enhance logging output."""
         self.stats.update(execution_time=et)

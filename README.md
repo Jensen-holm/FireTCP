@@ -78,4 +78,8 @@ fn main() raises -> None:
 run the service first using the mojo cli: `mojo run server.🔥` <br>
 then, run the client to connect to the service: `mojo run client.🔥` <br>
 
+### Limitations
+
+The HTTPLite server is built to handle one endpoint, hence the word Lite in the name. This is on purpose as sometmes this is all you need. Use HTTPLite if you want a litght weight HTTP server without extra bloat.
+
 FireApi HTTP Micro Servers can only run one route at a time, that route has to be a struct that inherits from the Route trait defined in the FireApi.route file.

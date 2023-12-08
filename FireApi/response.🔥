@@ -1,5 +1,11 @@
 from python import PythonObject
 from FireApi.server_stats import HTTPLiteStats
+from FireApi.common_http import (
+    INVALID_METHOD_CODE, INVLAID_METHOD_MESSAGE,
+    EMPTY_REQUEST_CODE, EMPTY_REQUEST_MESSAGE,
+    MALFORMED_REQUEST_CODE, MALFORMED_REQUEST_MESSAGE,
+    SUCCESS_CODE,
+)
 
 
 @value
@@ -7,24 +13,29 @@ struct Response(Copyable):
     var status_code: Int
     var body: String
 
+    @always_inline
     fn to_bytes(self, py_builtins: PythonObject, encoding: StringLiteral = "utf-8") raises -> PythonObject:
         return py_builtins.bytes(self.body, encoding)
 
     @staticmethod
+    @always_inline
     fn from_raw(raw_response: String) -> Self:
+        # TODO : actually parse response from raw into this struct
         return Response(
-            status_code=200,
+            status_code=SUCCESS_CODE,
             body=raw_response,
         )
     
+    @always_inline
     fn log_message(self, execution_time: Float64, raw_request: String, symbol: String = "") -> String:
-        let short_body = self.body if not len(self.body) > 20 else self.body[:20] + "..."
-        let short_input = raw_request if not len(raw_request) > 20 else raw_request[:20] + "..."
+        let short_body = self.body if not len(self.body) > 40 else self.body[:40] + "..."
+        let short_input = raw_request if not len(raw_request) > 40 else raw_request[:40] + "..."
         return "\t--- response status code: " + str(self.status_code) + "\n\t" 
                 + "--- raw request body: '" + short_input + "'\n\t"
                 + "--- response body: '" + short_body + "'\n\t"
                 + "--- execution time: " + str(execution_time) + " secs " + symbol
     
+    @always_inline
     fn print_log_message(self, execution_time: Float64, raw_request: String, symbol: String) -> None:
         let message = self.log_message(
             execution_time=execution_time, 
@@ -36,30 +47,33 @@ struct Response(Copyable):
     # default responses to save the user from writing
     # boiler plate error responses that are trivial
     @staticmethod
+    @always_inline
     fn success(body: String) -> Self:
         return Self(
-            status_code=200, 
+            status_code=SUCCESS_CODE, 
             body=body,
         )
     
     @staticmethod
-    fn empty_request_error(body: String = "Invalid Request: request was empty.") -> Self:
+    @always_inline
+    fn empty_request_error() -> Self:
         return Self(
-            status_code=400, 
-            body=body,
+            status_code=EMPTY_REQUEST_CODE, 
+            body=EMPTY_REQUEST_MESSAGE,
         )
     
     @staticmethod
-    fn malformed_request_error(body: String = "Invalid Request: malformed request.") -> Self:
+    @always_inline
+    fn malformed_request_error(body: String = MALFORMED_REQUEST_MESSAGE) -> Self:
         return Self(
-            status_code=400, 
+            status_code=MALFORMED_REQUEST_CODE, 
             body=body,
         )
     
     @staticmethod
+    @always_inline
     fn wrong_method_error(method: String) -> Self:
-        let body = "Bad Request: bad request method '" + method + "'" 
         return Self(
-            status_code=404,
-            body=body,
+            status_code=INVALID_METHOD_CODE,
+            body=INVLAID_METHOD_MESSAGE + " (" + method + ")"
         )

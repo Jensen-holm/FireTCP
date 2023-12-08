@@ -1,6 +1,7 @@
 from FireApi.modules import PyModules
 from FireApi.response import Response
 from FireApi.request import Request
+from FireApi.common_http import SUCCESS_CODE
 
 
 struct Client:
@@ -29,7 +30,6 @@ struct Client:
         let raw_response = self._client_socket.recv(1024).decode()
 
         _ = self._client_socket.close()
-        return Response(
-            status_code=200,
-            body=str(raw_response),
+        return Response.from_raw(
+            raw_response=str(raw_response),
         )

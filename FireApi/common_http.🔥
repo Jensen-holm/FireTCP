@@ -1,0 +1,10 @@
+alias SUCCESS_CODE = 200
+
+alias EMPTY_REQUEST_CODE = 400
+alias EMPTY_REQUEST_MESSAGE = "Invalid Request: request was empty."
+
+alias MALFORMED_REQUEST_CODE = 400
+alias MALFORMED_REQUEST_MESSAGE = "Invalid Request: malformed request."
+
+alias INVALID_METHOD_CODE = 404
+alias INVLAID_METHOD_MESSAGE = "Invalid Request: method does not exist."

@@ -7,8 +7,10 @@ trait Service(Copyable):
     fn func(self, req: Request) raises -> Response:
         ...
 
+    @always_inline
     fn get_endpoint(self) -> String:
         ...
 
+    @always_inline
     fn get_method(self) -> String:
         ...

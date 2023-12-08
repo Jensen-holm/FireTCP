@@ -1,4 +1,5 @@
 from python import PythonObject
+from FireApi.common_http import INVLAID_METHOD_MESSAGE
 
 
 @value
@@ -7,28 +8,31 @@ struct Request(Copyable):
     var method: String
 
     fn __init__(inout self, body: String, method: String) raises -> None:
-        _ = self.is_valid_method(method)
+        let valid = self.is_valid_method(method)
+        if not valid:
+            raise Error(INVLAID_METHOD_MESSAGE + " (" + method + ")")
+
         self.method = method
         self.body = body
 
+    @always_inline
     fn is_valid(self) -> Bool:
         return True
 
     @staticmethod
+    @always_inline
     fn is_valid_method(method: String) raises -> Bool:
         if method == "GET" or method == "POST":
             return True
-        raise Error(
-            "invalid method '"
-            + method
-            + "'. FireApi currently only supports GET & POST"
-        )
+        return False
 
+    @always_inline
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
         let byte_string = py_builtins.bytes(self.body, "utf-8")
         return byte_string
 
     @staticmethod
+    @always_inline
     fn from_raw(raw_request: String) raises -> Self:
         # we will want to change this later to actually parse raw http reqeusts
         let method = "GET"

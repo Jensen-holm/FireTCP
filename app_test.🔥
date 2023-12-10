@@ -1,13 +1,13 @@
-from FireApi import HTTPLite, Service, Request, Response
+from FireApi import Service, Request, Response
+from FireApi.servers.HTTPLite import HTTPLite
 
 
 fn kth_fibonacci(k: Int) raises -> Int:
-    if k <= 1:
-        return k
-    if not (0 < k <= 75):
-        raise Error(
-            "please submit a number between 1 and 75." + " you entered " + str(k)
-        )
+    if k <= 0:
+        let message = "invalid input to the kth_fib() function: '" + str(k) + "'"
+        raise Error(message)
+    if k == 1 or k == 2:
+        return k - 1
     return kth_fibonacci(k - 1) + kth_fibonacci(k - 2)
 
 
@@ -16,11 +16,9 @@ struct kthFib(Service):
     var endpoint: String
     var method: String
 
-    @always_inline
     fn get_method(self) -> String:
         return self.method
 
-    @always_inline
     fn get_endpoint(self) -> String:
         return self.endpoint
 
@@ -33,21 +31,25 @@ struct kthFib(Service):
             )
 
         except Error:
-            return Response.malformed_request_error(
-                body=str(Error),
+            return Response(
+                status_code=400,
+                body="error while attempting to convert "
+                + "request body into string: '"
+                + str(Error)
+                + "'",
             )
 
 
 fn main() raises -> None:
-    let fib_route = kthFib(
+    let fib_service = kthFib(
         endpoint="/kth_fibonacci",
         method="GET",
     )
 
-    var server = HTTPLite[kthFib](
+    var lite_server = HTTPLite[kthFib](
+        service=fib_service,
         port=9090,
-        service=fib_route,
         host_addr="127.0.0.1",
     )
 
-    server.run()
+    lite_server.run()

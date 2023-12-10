@@ -12,19 +12,8 @@ fn get_k() raises -> Int:
     return k
 
 
-fn number_suffix(num_str: String) -> String:
-    if num_str[-1] == "3":
-        return "rd"
-    if num_str[-1] == "2":
-        return "nd"
-    if num_str[-1] == "1":
-        return "st"
-    return "th"
-
-
 fn main() raises -> None:
     let k: Int = get_k()
-    let suffix = number_suffix(k)
 
     let client = Client(
         host_name="127.0.0.1",
@@ -42,4 +31,4 @@ fn main() raises -> None:
         raise Error("server error: " + resp.body)
 
     let kth_fib = resp.body
-    print(str(k) + suffix + " fibonacci = " + kth_fib)
+    print(str(k) + " fibonacci = " + kth_fib)

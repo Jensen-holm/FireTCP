@@ -23,7 +23,8 @@ in the request body from a client.
 
 in a file called service.🔥
 ```py
-from FireApi import HTTPLite, Service, Request, Response
+from FireApi import Service, Request, Response
+from FireApi.servers.HTTPLite import HTTPLite
 
 
 fn kth_fibonacci(k: Int) raises -> Int:

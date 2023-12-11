@@ -3,11 +3,11 @@ from FireApi.servers import TCPServer
 
 
 fn kth_fibonacci(k: Int) raises -> Int:
+    if k <= 1:
+        return k
     if k <= 0:
         let message = "invalid input to the kth_fib() function: '" + str(k) + "'"
         raise Error(message)
-    if k == 1 or k == 2:
-        return k - 1
     return kth_fibonacci(k - 1) + kth_fibonacci(k - 2)
 
 

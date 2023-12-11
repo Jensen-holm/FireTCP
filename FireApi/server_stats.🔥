@@ -1,4 +1,6 @@
-struct HTTPLiteStats:
+
+
+struct ServerStats:
     var total_requests: Int
     var total_execution_time: Float64
     var average_execution_time: Float64

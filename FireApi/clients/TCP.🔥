@@ -1,0 +1,32 @@
+from FireApi.modules import PyModules
+from FireApi.response import Response
+from FireApi.request import Request
+from FireApi.client import Client
+from FireApi.common_http import SUCCESS_CODE
+
+
+struct TCPClient(Client):
+    var _modules: PyModules
+    var _client_socket: PythonObject
+    var host_name: StringLiteral
+    var port: Int
+
+    fn __init__(inout self, host_name: StringLiteral, port: Int) raises -> None:
+        self._modules = PyModules()
+        self._client_socket = self._modules.socket.socket()
+        self.host_name = host_name
+        self.port = port
+
+    fn send_request(self, request: Request) raises -> Response:
+        _ = self._client_socket.connect((self.host_name, self.port))
+        let request_bytes = request.to_bytes(
+            py_builtins=self._modules.py,
+        )
+
+        _ = self._client_socket.send(request_bytes)
+        let raw_response = self._client_socket.recv(1024).decode()
+
+        _ = self._client_socket.close()
+        return Response.from_raw(
+            raw_response=str(raw_response),
+        )

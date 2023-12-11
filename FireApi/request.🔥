@@ -4,16 +4,19 @@ from FireApi.common_http import INVLAID_METHOD_MESSAGE
 
 @value
 struct Request(Copyable):
-    var body: String
-    var method: String
+    var __body: String
+    var __method: String
 
-    fn __init__(inout self, body: String, method: String) raises -> None:
-        let valid = self.is_valid_method(method)
-        if not valid:
-            raise Error(INVLAID_METHOD_MESSAGE + " (" + method + ")")
-
-        self.method = method
-        self.body = body
+    fn __init__(inout self, body: String, method: String = "") raises -> None:
+        self.__method = method
+        self.__body = body
+    
+    @always_inline
+    fn body(self) -> String:
+        return self.__body
+    
+    fn method(self) -> String:
+        return self.__method
 
     @always_inline
     fn is_valid(self) -> Bool:
@@ -28,7 +31,7 @@ struct Request(Copyable):
 
     @always_inline
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
-        let byte_string = py_builtins.bytes(self.body, "utf-8")
+        let byte_string = py_builtins.bytes(self.__body, "utf-8")
         return byte_string
 
     @staticmethod

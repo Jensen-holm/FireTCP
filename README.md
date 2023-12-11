@@ -16,74 +16,62 @@ Step 2: `$ curl -sS https://raw.githubusercontent.com/Jensen-holm/FireApi/main/i
 Step 3: Once you have made a project and cloned the FireApi you can get coding! Bellow is the hello world.
 
 
-### HTTPLite Fibonacci Example
+### Simple TCP Server Fibonacci Example
 
 this is a demonstration of a FireApi HTTPLite service that computes the kth fibonnaci number given as input
 in the request body from a client.
 
 in a file called service.🔥
 ```py
-from FireApi import Service, Request, Response
-from FireApi.servers.HTTPLite import HTTPLite
+from FireApi import TCPService, Request, Response
+from FireApi.servers import TCPServer
 
 
 fn kth_fibonacci(k: Int) raises -> Int:
-    if k <= 1:
-        return k
-    if not (0 < k <= 75):
-        raise Error(
-            "please submit a number between 1 and 75." + " you entered " + str(k)
-        )
+    if k <= 0:
+        let message = "invalid input to the kth_fib() function: '" + str(k) + "'"
+        raise Error(message)
+    if k == 1 or k == 2:
+        return k - 1
     return kth_fibonacci(k - 1) + kth_fibonacci(k - 2)
 
 
 @value
-struct kthFib(Service):
-    var endpoint: String
-    var method: String
-
-    @always_inline
-    fn get_method(self) -> String:
-        return self.method
-
-    @always_inline
-    fn get_endpoint(self) -> String:
-        return self.endpoint
-
+struct kthFib(TCPService):
     fn func(self, req: Request) raises -> Response:
         try:
-            let k: Int = atol(req.body)
+            let k: Int = atol(req.body())
             let result: Int = kth_fibonacci(k=k)
             return Response.success(
                 body=str(result),
             )
 
         except Error:
-            return Response.malformed_request_error(
-                body=str(Error),
+            return Response.error(
+                status_code=400,
+                body="error while attempting to convert "
+                + "request body into string: '"
+                + str(Error)
+                + "'",
             )
 
 
 fn main() raises -> None:
-    let fib_route = kthFib(
-        endpoint="/kth_fibonacci",
-        method="GET",
-    )
+    let fib_service = kthFib()
 
-    var server = HTTPLite[kthFib](
+    var lite_server = TCPServer[kthFib](
+        service=fib_service,
         port=9090,
-        service=fib_route,
         host_addr="127.0.0.1",
     )
 
-    server.run()
-
+    lite_server.run()
 ```
 
 in a file called client.🔥
 ```py
-
-m FireApi import Client, Response, Request
+from FireApi import Request, Response
+from FireApi.clients import TCPClient
 from sys import argv
 import random
 
@@ -99,37 +87,27 @@ fn get_k() raises -> Int:
 
 fn main() raises -> None:
     let k: Int = get_k()
-    let suffix = number_suffix(k)
 
-    let client = Client(
+    let client = TCPClient(
         host_name="127.0.0.1",
         port=9090,
-        endpoint="/kth_fibonnaci",
     )
 
     let req = Request(
         body=str(k),
-        method="GET",
     )
 
     let resp = client.send_request(request=req)
-
-    # with current version of FireApi, resp.status_code will always be 200
-    # because I need to implement http protocol for reading responses still
     if resp.status_code != 200:
         raise Error("server error: " + resp.body)
 
     let kth_fib = resp.body
     print(str(k) + " fibonacci = " + kth_fib)
-
 ```
 
 run the service first using the mojo cli: `mojo run server.🔥` <br>
 then, run the client to connect to the service: `mojo run client.🔥` <br>
 
-### Limitations
+### Roadmap
 
-The HTTPLite server is built to handle one endpoint, hence the word Lite in the name. This is on purpose as sometmes this is all you need. Use HTTPLite if you want a litght weight HTTP server without extra bloat.
-
-FireApi HTTP Micro Servers can only run one route at a time, that route has to be a struct that inherits from the Route trait defined in the FireApi.route file.
-
+Currently simple TCP Servers / Clients like the one shown above is the only thing working. In the near future I plan on implementing clients and servers that follow HTTP so that users of FireApi can host their mojo api's on the web.

@@ -1,14 +1,15 @@
 from FireApi.connection import Connection
-from FireApi.service import Service
+from FireApi.service import TCPService
 from FireApi.request import Request
 from FireApi.response import Response
 from FireApi.modules import PyModules
-from FireApi.server_stats import HTTPLiteStats
+from FireApi.server_stats import ServerStats
+
 from python import Python, PythonObject
 import time
 
 
-struct HTTPLite[S: Service]:
+struct TCPServer[S: TCPService]:
     """'Lite' wrapper for the python socket library with HTTP protocol."""
     var __modules: PyModules
     var __py_socket: PythonObject
@@ -16,13 +17,13 @@ struct HTTPLite[S: Service]:
     var host_addr: StringLiteral
     var service: S
     var port: Int
-    var stats: HTTPLiteStats
+    var stats: ServerStats
 
     fn __init__(inout self, service: S, port: Int, host_addr: StringLiteral) raises -> None:
         self.port = port
         self.host_addr = host_addr
         self.service = service
-        self.stats = HTTPLiteStats()
+        self.stats = ServerStats()
         self.__modules = PyModules()
         self.host_name = self.__modules.socket.gethostbyname(
             self.__modules.socket.gethostname(),
@@ -64,7 +65,6 @@ struct HTTPLite[S: Service]:
         return "http://" 
             + str(self.host_addr) 
             + "/" + self.port 
-            + self.service.get_endpoint()
         
     @always_inline
     fn __update_metrics(inout self, et: Float64) -> None:
@@ -106,12 +106,13 @@ struct HTTPLite[S: Service]:
         if not raw_request:
             return Response.empty_request_error()
 
-        let request = Request.from_raw(raw_request)
-        if not request.is_valid():
-            return Response.malformed_request_error()
+        try:
+            let request = Request.from_raw(raw_request)
+            let response = self.service.func(req=request)
+            return response
+        except Error:
+            return Response.error(
+                status_code=MALFORMED_REQUEST_CODE,
+                body=MALFORMED_REQUEST_MESSAGE + " (" + str(Error) + ")", 
+            )
         
-        if self.service.get_method() != request.method:
-            return Response.wrong_method_error(method=request.method)
-
-        let response = self.service.func(req=request)
-        return response

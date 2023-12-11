@@ -1,4 +1,5 @@
-from FireApi import Client, Response, Request
+from FireApi import Request, Response
+from FireApi.clients import TCPClient
 from sys import argv
 import random
 
@@ -15,15 +16,13 @@ fn get_k() raises -> Int:
 fn main() raises -> None:
     let k: Int = get_k()
 
-    let client = Client(
+    let client = TCPClient(
         host_name="127.0.0.1",
         port=9090,
-        endpoint="/kth_fibonnaci",
     )
 
     let req = Request(
         body=str(k),
-        method="GET",
     )
 
     let resp = client.send_request(request=req)

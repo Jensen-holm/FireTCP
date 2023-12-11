@@ -1,35 +1,4 @@
-from FireApi.modules import PyModules
-from FireApi.response import Response
-from FireApi.request import Request
-from FireApi.common_http import SUCCESS_CODE
 
 
-struct Client:
-    var _modules: PyModules
-    var _client_socket: PythonObject
-    var host_name: StringLiteral
-    var port: Int
-    var endpoint: String
-
-    fn __init__(
-        inout self, host_name: StringLiteral, port: Int, endpoint: String
-    ) raises -> None:
-        self._modules = PyModules()
-        self._client_socket = self._modules.socket.socket()
-        self.host_name = host_name
-        self.port = port
-        self.endpoint = endpoint
-
-    fn send_request(self, request: Request) raises -> Response:
-        _ = self._client_socket.connect((self.host_name, self.port))
-        let request_bytes = request.to_bytes(
-            py_builtins=self._modules.py,
-        )
-
-        _ = self._client_socket.send(request_bytes)
-        let raw_response = self._client_socket.recv(1024).decode()
-
-        _ = self._client_socket.close()
-        return Response.from_raw(
-            raw_response=str(raw_response),
-        )
+trait Client:
+    ...

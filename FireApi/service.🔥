@@ -3,7 +3,7 @@ from FireApi.request import Request
 
 
 @value
-trait Service(Copyable):
+trait HTTPService(TCPService):
     fn func(self, req: Request) raises -> Response:
         ...
 
@@ -13,4 +13,10 @@ trait Service(Copyable):
 
     @always_inline
     fn get_method(self) -> String:
+        ...
+
+
+@value
+trait TCPService(Copyable):
+    fn func (self, req: Request) raises -> Response:
         ...

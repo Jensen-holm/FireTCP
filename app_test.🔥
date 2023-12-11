@@ -1,5 +1,5 @@
-from FireApi import Service, Request, Response
-from FireApi.servers.HTTPLite import HTTPLite
+from FireApi import TCPService, Request, Response
+from FireApi.servers import TCPServer
 
 
 fn kth_fibonacci(k: Int) raises -> Int:
@@ -12,26 +12,17 @@ fn kth_fibonacci(k: Int) raises -> Int:
 
 
 @value
-struct kthFib(Service):
-    var endpoint: String
-    var method: String
-
-    fn get_method(self) -> String:
-        return self.method
-
-    fn get_endpoint(self) -> String:
-        return self.endpoint
-
+struct kthFib(TCPService):
     fn func(self, req: Request) raises -> Response:
         try:
-            let k: Int = atol(req.body)
+            let k: Int = atol(req.body())
             let result: Int = kth_fibonacci(k=k)
             return Response.success(
                 body=str(result),
             )
 
         except Error:
-            return Response(
+            return Response.error(
                 status_code=400,
                 body="error while attempting to convert "
                 + "request body into string: '"
@@ -41,12 +32,9 @@ struct kthFib(Service):
 
 
 fn main() raises -> None:
-    let fib_service = kthFib(
-        endpoint="/kth_fibonacci",
-        method="GET",
-    )
+    let fib_service = kthFib()
 
-    var lite_server = HTTPLite[kthFib](
+    var lite_server = TCPServer[kthFib](
         service=fib_service,
         port=9090,
         host_addr="127.0.0.1",

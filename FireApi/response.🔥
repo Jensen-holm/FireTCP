@@ -1,5 +1,4 @@
 from python import PythonObject
-from FireApi.server_stats import HTTPLiteStats
 from FireApi.common_http import (
     INVALID_METHOD_CODE, INVLAID_METHOD_MESSAGE,
     EMPTY_REQUEST_CODE, EMPTY_REQUEST_MESSAGE,
@@ -51,6 +50,14 @@ struct Response(Copyable):
     fn success(body: String) -> Self:
         return Self(
             status_code=SUCCESS_CODE, 
+            body=body,
+        )
+    
+    @staticmethod
+    @always_inline
+    fn error(body: String, status_code: Int) -> Self:
+        return Self(
+            status_code=status_code,
             body=body,
         )
     

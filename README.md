@@ -17,10 +17,9 @@ Step 3: Once you have made a project and cloned the FireApi you can get coding! 
 
 ### Simple TCP Server Fibonacci Example
 
-this is a demonstration of a FireApi HTTPLite service that computes the kth fibonnaci number given as input
-in the request body from a client.
+this is a demonstration of a FireApi HTTPLite service that computes the kth fibonnaci number given as input in the request body from a client.
 
-in a file called service.🔥
+in a file called app.🔥
 ```py
 from FireApi import TCPService, Request, Response
 from FireApi.servers import TCPServer
@@ -104,13 +103,13 @@ fn main() raises -> None:
     print(str(k) + " fibonacci = " + kth_fib)
 ```
 
-run the service first using the mojo cli: `mojo run server.🔥` <br>
+run the service first using the mojo cli: `mojo run app.🔥` <br>
 then, run the client to connect to the service: `mojo run client.🔥` <br>
 
 
 #### Tmux demo
 
-![](https://github.com/Jensen-holm/FireApi/demo/tmux_fibonacci_demo.gif)
+![](https://github.com/Jensen-holm/FireApi/blob/main/demo/tmux_fibonacci_demo.gif)
 
 
 ### Roadmap

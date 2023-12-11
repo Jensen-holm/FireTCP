@@ -1,0 +1,33 @@
+from FireApi import Request, Response
+from FireApi.clients import TCPClient
+from sys import argv
+import random
+
+
+fn get_k() raises -> Int:
+    let args = argv()
+    if len(args) < 2:
+        raise Error("enter a number for k")
+    let inp = args[1]
+    let k: Int = atol(inp)
+    return k
+
+
+fn main() raises -> None:
+    let k: Int = get_k()
+
+    let client = TCPClient(
+        host_name="127.0.0.1",
+        port=9090,
+    )
+
+    let req = Request(
+        body=str(k),
+    )
+
+    let resp = client.send_request(request=req)
+    if resp.status_code != 200:
+        raise Error("server error: " + resp.body)
+
+    let kth_fib = resp.body
+    print(str(k) + " fibonacci = " + kth_fib)

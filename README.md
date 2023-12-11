@@ -1,7 +1,6 @@
 # FireApi
 
-Bring your [mojo]() AI model to the web with a simple HTTP FireApi server!!
-FireApi is an HTTP API for the AI programming language [mojo]()
+Bring your [mojo](https://www.modular.com/max/mojo) API to the web with a simple TCP & HTTP FireApi server!!
 
 ### Dependencies
  - mojo version 0.6.0 or newer
@@ -107,6 +106,12 @@ fn main() raises -> None:
 
 run the service first using the mojo cli: `mojo run server.🔥` <br>
 then, run the client to connect to the service: `mojo run client.🔥` <br>
+
+
+#### Tmux demo
+
+![](https://github.com/Jensen-holm/FireApi/demo/tmux_fibonacci_demo.gif)
+
 
 ### Roadmap
 

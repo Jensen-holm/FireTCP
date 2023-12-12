@@ -1,2 +1,1 @@
-from FireApi.clients.HTTP import HTTPClient
 from FireApi.clients.TCP import TCPClient

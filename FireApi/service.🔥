@@ -1,22 +1,7 @@
-from FireApi.response import Response
-from FireApi.request import Request
-
-
-@value
-trait HTTPService(TCPService):
-    fn func(self, req: Request) raises -> Response:
-        ...
-
-    @always_inline
-    fn get_endpoint(self) -> String:
-        ...
-
-    @always_inline
-    fn get_method(self) -> String:
-        ...
+from FireApi.response import TCPResponse
 
 
 @value
 trait TCPService(Copyable):
-    fn func (self, req: Request) raises -> Response:
+    fn func(self, req: TCPRequest) raises -> TCPResponse:
         ...

@@ -1,5 +1,0 @@
-from FireApi.client import Client
-
-
-struct HTTPClient(Client):
-    ...

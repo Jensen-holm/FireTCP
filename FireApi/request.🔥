@@ -1,45 +1,27 @@
 from python import PythonObject
-from FireApi.common_http import INVLAID_METHOD_MESSAGE
+from FireApi.common_messages import INVLAID_METHOD_MESSAGE
+
+
+trait Request(Copyable):
+    @always_inline
+    fn body(self) -> String:
+        ...
+
+    fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
+        ...
 
 
 @value
-struct Request(Copyable):
+struct TCPRequest(Request):
     var __body: String
-    var __method: String
 
-    fn __init__(inout self, body: String, method: String = "") raises -> None:
-        self.__method = method
+    fn __init__(inout self, body: String) -> None:
         self.__body = body
-    
+
     @always_inline
     fn body(self) -> String:
         return self.__body
-    
-    fn method(self) -> String:
-        return self.__method
 
-    @always_inline
-    fn is_valid(self) -> Bool:
-        return True
-
-    @staticmethod
-    @always_inline
-    fn is_valid_method(method: String) raises -> Bool:
-        if method == "GET" or method == "POST":
-            return True
-        return False
-
-    @always_inline
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
-        let byte_string = py_builtins.bytes(self.__body, "utf-8")
+        let byte_string = py_builtins.bytes(self.body(), "utf-8")
         return byte_string
-
-    @staticmethod
-    @always_inline
-    fn from_raw(raw_request: String) raises -> Self:
-        # we will want to change this later to actually parse raw http reqeusts
-        let method = "GET"
-        return Request(
-            body=raw_request,
-            method=method,
-        )

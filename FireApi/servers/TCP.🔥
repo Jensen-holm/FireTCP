@@ -1,15 +1,17 @@
 from FireApi.connection import Connection
 from FireApi.service import TCPService
-from FireApi.request import Request
-from FireApi.response import Response
+from FireApi.request import TCPRequest
+from FireApi.response import TCPResponse
 from FireApi.modules import PyModules
 from FireApi.server_stats import ServerStats
+from FireApi.server import Server
+from FireApi.common_messages import EMPTY_REQUEST_MESSAGE
 
 from python import Python, PythonObject
 import time
 
 
-struct TCPServer[S: TCPService]:
+struct TCPLite[S: TCPService](Server):
     """'Lite' wrapper for the python socket library with HTTP protocol."""
     var __modules: PyModules
     var __py_socket: PythonObject
@@ -32,16 +34,13 @@ struct TCPServer[S: TCPService]:
         self.__spinup_socket()
         self.__bind_pySocket()
 
-    @always_inline
     fn __bind_pySocket(self) raises -> None:
         """Private funciton that binds the initialized python socket to the given host and port. this runs in __init__()"""
         _ = self.__py_socket.bind((self.host_addr, self.port))
 
-    @always_inline
     fn __close_socket(self) raises -> None:
         _ = self.__py_socket.close()
 
-    @always_inline
     fn __spinup_socket(inout self) raises -> None:
         self.__py_socket = self.__modules.socket.socket(
             self.__modules.socket.AF_INET,
@@ -51,7 +50,7 @@ struct TCPServer[S: TCPService]:
     @always_inline
     fn __print_start(self) raises -> None:
         let fire = "🔥🔥🔥"
-        print(fire + " FireApi HTTPLite Service " + fire + "\n")
+        print(fire + " FireApi TCPLite Service " + fire + "\n")
         print("listening @ " + self.full_addr() + " ...\n")
 
     @always_inline
@@ -61,10 +60,8 @@ struct TCPServer[S: TCPService]:
 
     @always_inline
     fn full_addr(self) raises -> String:
-        """Returns full address of the HTTPLite server including the routes' endpoint."""
-        return "http://" 
-            + str(self.host_addr) 
-            + "/" + self.port 
+        return str(self.host_addr) 
+                + "/" + self.port 
         
     @always_inline
     fn __update_metrics(inout self, et: Float64) -> None:
@@ -72,7 +69,6 @@ struct TCPServer[S: TCPService]:
         self.stats.update(execution_time=et)
 
     fn run(inout self) raises -> None:
-        """Main funciton that the user calls to begin hosting the HTTPLite server."""
         if not self.stats.total_requests:
             self.__print_start()
 
@@ -82,11 +78,11 @@ struct TCPServer[S: TCPService]:
 
         let st: Float64 = time.now()
         let raw_request = connection.recieve_data()
-        let response: Response = self.__handle_request(
+        let response: TCPResponse = self.__handle_request(
             connection=connection, raw_request=raw_request,
         )
 
-        connection.send_response(response)
+        connection.send_response[TCPResponse](response)
         connection.close()
 
         # print additional response information
@@ -101,18 +97,14 @@ struct TCPServer[S: TCPService]:
         # go back to listening for requests 
         self.run()
 
-    fn __handle_request(self, raw_request: String, connection: Connection) raises -> Response:
+    fn __handle_request(self, raw_request: String, connection: Connection) raises -> TCPResponse:
         """Private function that makes generates a Response object given a Request object."""
         if not raw_request:
-            return Response.empty_request_error()
+            return TCPResponse.empty_error(error_str=EMPTY_REQUEST_MESSAGE)
 
         try:
-            let request = Request.from_raw(raw_request)
-            let response = self.service.func(req=request)
+            let request = TCPRequest(body=raw_request)
+            let response: TCPResponse = self.service.func(req=request)
             return response
         except Error:
-            return Response.error(
-                status_code=MALFORMED_REQUEST_CODE,
-                body=MALFORMED_REQUEST_MESSAGE + " (" + str(Error) + ")", 
-            )
-        
+            return TCPResponse.error(error_str=str(Error))

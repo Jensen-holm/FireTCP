@@ -1,5 +1,5 @@
-from FireApi import TCPService, Request, Response
-from FireApi.servers import TCPServer
+from FireApi import TCPResponse, TCPRequest, TCPService
+from FireApi.servers import TCPLite
 
 
 fn kth_fibonacci(k: Int) raises -> Int:
@@ -13,28 +13,24 @@ fn kth_fibonacci(k: Int) raises -> Int:
 
 @value
 struct kthFib(TCPService):
-    fn func(self, req: Request) raises -> Response:
+    fn func(self, req: TCPRequest) raises -> TCPResponse:
         try:
             let k: Int = atol(req.body())
             let result: Int = kth_fibonacci(k=k)
-            return Response.success(
-                body=str(result),
-            )
-
+            return TCPResponse(body=str(result))
         except Error:
-            return Response.error(
-                status_code=400,
+            return TCPResponse(
                 body="Error while trying to compute the '"
-                    + req.body()
-                    + "'th fibonacci number: "
-                    + str(Error)
+                + req.body()
+                + "'th fibonacci number: "
+                + str(Error),
             )
 
 
 fn main() raises -> None:
     let fib_service = kthFib()
 
-    var lite_server = TCPServer[kthFib](
+    var lite_server = TCPLite[kthFib](
         service=fib_service,
         port=9090,
         host_addr="127.0.0.1",

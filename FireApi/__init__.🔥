@@ -1,7 +1,6 @@
 import FireApi.clients as clients
 import FireApi.servers as servers
-
-from FireApi.request import Request
-from FireApi.response import Response
-from FireApi.service import TCPService, HTTPService
-from FireApi.common_http import *
+from FireApi.request import Request, TCPRequest
+from FireApi.response import Response, TCPResponse
+from FireApi.service import TCPService
+from FireApi.common_messages import *

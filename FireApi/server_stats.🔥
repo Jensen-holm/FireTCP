@@ -1,5 +1,3 @@
-
-
 struct ServerStats:
     var total_requests: Int
     var total_execution_time: Float64

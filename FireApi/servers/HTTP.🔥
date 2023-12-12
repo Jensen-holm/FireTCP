@@ -1,5 +1,0 @@
-from FireApi.service import HTTPService
-
-
-struct HTTPServer[S: HTTPService]:
-    ...

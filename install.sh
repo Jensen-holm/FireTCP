@@ -21,7 +21,7 @@ print_done
 
 cd FireApi
 
-rm -rf .git .gitignore test
+rm -rf .git .gitignore test examples demo
 
 rm -f install.sh *_test.🔥
 

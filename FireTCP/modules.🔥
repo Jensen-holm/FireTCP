@@ -16,5 +16,5 @@ struct PyModules:
 
     @staticmethod
     fn __load_builtins_module() raises -> PythonObject:
-        let builtins  = Python.import_module("builtins")
+        let builtins = Python.import_module("builtins")
         return builtins

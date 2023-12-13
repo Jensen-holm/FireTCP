@@ -1,5 +1,5 @@
 from python import PythonObject
-from FireApi.common_messages import *
+from FireTCP.common_messages import *
 
 trait Response(Copyable):
     @always_inline

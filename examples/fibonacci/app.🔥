@@ -1,5 +1,5 @@
-from FireApi import TCPResponse, TCPRequest, TCPService
-from FireApi.servers import TCPLite
+from FireTCP import TCPResponse, TCPRequest, TCPService
+from FireTCP.servers import TCPLite
 
 
 fn kth_fibonacci(k: Int) raises -> Int:

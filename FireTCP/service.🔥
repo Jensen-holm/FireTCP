@@ -1,4 +1,4 @@
-from FireApi.response import TCPResponse
+from FireTCP.response import TCPResponse
 
 
 @value

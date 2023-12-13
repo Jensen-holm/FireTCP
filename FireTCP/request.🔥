@@ -1,5 +1,5 @@
 from python import PythonObject
-from FireApi.common_messages import INVLAID_METHOD_MESSAGE
+from FireTCP.common_messages import INVLAID_METHOD_MESSAGE
 
 
 trait Request(Copyable):

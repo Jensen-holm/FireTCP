@@ -1,6 +1,6 @@
-from FireApi.modules import PyModules
-from FireApi.client import Client
-from FireApi.request import TCPRequest
+from FireTCP.modules import PyModules
+from FireTCP.client import Client
+from FireTCP.request import TCPRequest
 
 
 struct TCPClient(Client):

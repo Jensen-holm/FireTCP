@@ -11,16 +11,10 @@ struct PyModules:
 
     @staticmethod
     fn __load_socket_module() raises -> PythonObject:
-        try:
-            let socket = Python.import_module("socket")
-            return socket
-        except Exception:
-            raise Error("error loading python socket module.")
+        let socket = Python.import_module("socket")
+        return socket
 
     @staticmethod
     fn __load_builtins_module() raises -> PythonObject:
-        try:
-            let py = Python.import_module("builtins")
-            return py
-        except Exception:
-            raise Error("error loading python builtins module.")
+        let builtins  = Python.import_module("builtins")
+        return builtins

@@ -1,5 +1,5 @@
-from FireApi import TCPRequest, TCPResponse
-from FireApi.clients import TCPClient
+from FireTCP import TCPRequest, TCPResponse
+from FireTCP.clients import TCPClient
 from sys import argv
 import random
 

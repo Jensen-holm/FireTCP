@@ -1,11 +1,11 @@
-from FireApi.connection import Connection
-from FireApi.service import TCPService
-from FireApi.request import TCPRequest
-from FireApi.response import TCPResponse
-from FireApi.modules import PyModules
-from FireApi.server_stats import ServerStats
-from FireApi.server import Server
-from FireApi.common_messages import EMPTY_REQUEST_MESSAGE
+from FireTCP.connection import Connection
+from FireTCP.service import TCPService
+from FireTCP.request import TCPRequest
+from FireTCP.response import TCPResponse
+from FireTCP.modules import PyModules
+from FireTCP.server_stats import ServerStats
+from FireTCP.server import Server
+from FireTCP.common_messages import EMPTY_REQUEST_MESSAGE
 
 from python import Python, PythonObject
 import time

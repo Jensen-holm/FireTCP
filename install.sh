@@ -11,35 +11,34 @@ print_done() {
     echo -e "✅\n"
 }
 
-echo -e "${FIRE}${FIRE}${CYAN}Installing FireApi${RESET}${FIRE}${FIRE}\n"
+echo -e "${FIRE}${FIRE}${CYAN}Installing FireTCP${RESET}${FIRE}${FIRE}\n"
 
-echo -e -n "${BLUE}cloning the repo${RESET} (https://github.com/Jensen-holm/FireApi) ... "
+echo -e -n "${BLUE}cloning the repo${RESET} (https://github.com/Jensen-holm/FireTCP) ... "
 
-git clone https://github.com/Jensen-holm/FireApi.git > /dev/null 2>&1
+git clone https://github.com/Jensen-holm/FireTCP.git > /dev/null 2>&1
 
 print_done
 
-cd FireApi
+cd FireTCP
 
 rm -rf .git .gitignore test examples demo
 
-rm -f install.sh *_test.🔥
+rm -f install.sh
 
-cd FireApi && mv * ..
+cd FireTCP && mv * ..
 
-cd .. && rm -rf FireApi examples
+cd .. && rm -rf FireTCP examples
 
 cd ..
 
 pwd
 
-echo -e -n "${BLUE}packaging FireApi/ module into FireApi.📦${RESET} ... "
+echo -e -n "${BLUE}packaging FireApi/ module into FireTCP.📦${RESET} ... "
 
-mojo package FireApi -o FireApi.📦
+mojo package FireTCP -o FireTCP.📦
 
 print_done
 
-rm -rf FireApi
+rm -rf FireTCP
 
-echo -e "${FIRE}${FIRE}${GREEN} FireApi Installed Successfully ${RESET}${FIRE}${FIRE}"
-
+echo -e "${FIRE}${FIRE}${GREEN} FireTCP Installed Successfully ${RESET}${FIRE}${FIRE}"

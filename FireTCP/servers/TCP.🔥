@@ -68,7 +68,7 @@ struct TCPLite[S: TCPService](Server):
         """Private function that updates the metrics that enhance logging output."""
         self.stats.update(execution_time=et)
 
-    fn run(inout self) raises -> None:
+    fn serve(inout self) raises -> None:
         if not self.stats.total_requests:
             self.__print_start()
 
@@ -95,7 +95,7 @@ struct TCPLite[S: TCPService](Server):
         )
 
         # go back to listening for requests 
-        self.run()
+        self.serve()
 
     fn __handle_request(self, raw_request: String, connection: Connection) raises -> TCPResponse:
         """Private function that makes generates a Response object given a Request object."""

@@ -36,4 +36,4 @@ fn main() raises -> None:
         host_addr="127.0.0.1",
     )
 
-    lite_server.run()
+    lite_server.serve()

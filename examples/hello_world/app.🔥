@@ -4,6 +4,7 @@ from FireTCP.servers import TCPLite
 
 @value
 struct HelloService(TCPService):
+
     fn func(self, req: TCPRequest) raises -> TCPResponse:
         return TCPResponse(
             body="You sent the following data: " + req.body(),
@@ -17,4 +18,4 @@ fn main() raises -> None:
         host_addr="127.0.0.1",
     )
 
-    server.run()
+    server.serve()

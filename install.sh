@@ -33,7 +33,7 @@ cd ..
 
 pwd
 
-echo -e -n "${BLUE}packaging FireApi/ module into FireTCP.📦${RESET} ... "
+echo -e -n "${BLUE}packaging FireTCP/ module into FireTCP.📦${RESET} ... "
 
 mojo package FireTCP -o FireTCP.📦
 

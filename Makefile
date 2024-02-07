@@ -5,18 +5,19 @@ TARGETS = FireTCP.📦
 package:
 	mojo package ./FireTCP -o $(TARGETS)
 
-install:
+install: package
 	# no going back after running this.
 	# to get the source code back, you will have
 	# to re clone the repository.
-	package
+
 	rm -rf \
 		$(EXAMPLE_DIR) \
-		$(SRC_DIR)
-		.git
+		$(SRC_DIR) \
+		.git >/dev/null 2>&1
+
 	rm -r \
 		.gitignore \
-		LISCENSE \
+		LICENSE \
 		README.md \
-		Makefile
+		Makefile >/dev/null 2>&1
 

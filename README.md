@@ -8,9 +8,15 @@ Bring your [mojo](https://www.modular.com/max/mojo) Api to the web with a simple
  - need to set the python library environment variable to compile
 
 ### Hello FireApi
-Step 1: `$ mkdir hello_fire_api && cd hello_fire_api` <br>
 
-Step 2: `$ curl -sS https://raw.githubusercontent.com/Jensen-holm/FireTCP/main/install.sh | bash`
+Step 1: Create your FireTCP project. <br>
+    `$ mkdir hello_fire_api && cd hello_fire_api`
+
+Step 2: Clone the Repository. <br>
+    `$ git clone https://github.com/Jensen-holm/FireTCP.git`
+
+Step 3: Install using the Makefile. <br>
+    `$ cd FireTCP && make install && mv FireTCP.📦 .. && cd ..`
 
 Step 3: Once you have made a project and cloned the FireApi you can get coding! Check out the examples below or in the examples directory before getting started or [read this tutorial I made on medium](https://medium.com/@jensen.dev.01/socket-programming-in-mojo-e113f6c8cbef).
 

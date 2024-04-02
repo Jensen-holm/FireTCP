@@ -3,14 +3,14 @@ from FireTCP.clients import TCPClient
 
 
 fn main() raises -> None:
-    let client = TCPClient(
+    var client = TCPClient(
         port=9090,
         host_name="127.0.0.1",
     )
 
-    let request = TCPRequest(
+    var request = TCPRequest(
         body="Hello FireTCP",
     )
 
-    let response = client.send_request(request)
+    var response = client.send_request(request)
     print(response.body())

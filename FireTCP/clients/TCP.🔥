@@ -17,12 +17,12 @@ struct TCPClient(Client):
 
     fn send_request(self, request: TCPRequest) raises -> TCPResponse:
         _ = self._client_socket.connect((self.host_name, self.port))
-        let request_bytes = request.to_bytes(
+        var request_bytes = request.to_bytes(
             py_builtins=self._modules.py,
         )
 
         _ = self._client_socket.send(request_bytes)
-        let raw_response = self._client_socket.recv(1024).decode()
+        var raw_response = self._client_socket.recv(1024).decode()
 
         _ = self._client_socket.close()
         return TCPResponse(body=str(raw_response))

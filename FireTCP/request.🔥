@@ -23,5 +23,5 @@ struct TCPRequest(Request):
         return self.__body
 
     fn to_bytes(self, py_builtins: PythonObject) raises -> PythonObject:
-        let byte_string = py_builtins.bytes(self.body(), "utf-8")
+        var byte_string = py_builtins.bytes(self.body(), "utf-8")
         return byte_string

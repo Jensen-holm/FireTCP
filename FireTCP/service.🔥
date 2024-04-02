@@ -1,7 +1,7 @@
 from FireTCP.response import TCPResponse
 
 
-@value
 trait TCPService(Copyable):
     fn func(self, req: TCPRequest) raises -> TCPResponse:
         ...
+

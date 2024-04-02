@@ -34,16 +34,16 @@ struct TCPResponse(Response):
     
     @always_inline
     fn log_message(self, execution_time: Float64, raw_request: String, symbol: String = "") -> String:
-        let body = self.body()
-        let short_body = body if not len(body) > 40 else body[:40] + "..."
-        let short_input = raw_request if not len(raw_request) > 40 else raw_request[:40] + "..."
+        var body = self.body()
+        var short_body = body if not len(body) > 40 else body[:40] + "..."
+        var short_input = raw_request if not len(raw_request) > 40 else raw_request[:40] + "..."
         return  "\t--- raw request body: '" + short_input + "'\n\t"
                 + "--- response body: '" + short_body + "'\n\t"
                 + "--- execution time: " + str(execution_time) + " secs " + symbol
     
     @always_inline
     fn print_log_message(self, execution_time: Float64, raw_request: String, symbol: String) -> None:
-        let message = self.log_message(
+        var message = self.log_message(
             execution_time=execution_time, 
             raw_request=raw_request,
             symbol=symbol,

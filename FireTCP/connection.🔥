@@ -15,19 +15,19 @@ struct Connection:
     fn recieve_data(
         self, size: Int = 1024, encoding: StringLiteral = "utf-8"
     ) raises -> String:
-        let data = self.conn.recv(size).decode(encoding)
+        var data = self.conn.recv(size).decode(encoding)
         return str(data)
 
     fn send_response[R: Response](self, response: R) raises -> None:
-        let response_bytes = response.to_bytes(py_builtins=self.__py)
+        var response_bytes = response.to_bytes(py_builtins=self.__py)
         _ = self.conn.sendall(response_bytes)
 
     fn close(self) raises -> None:
         _ = self.conn.close()
 
     fn log_connect_message(self) raises -> String:
-        let host_name = str(self.addr[0])
-        let port = str(self.addr[1])
+        var host_name = str(self.addr[0])
+        var port = str(self.addr[1])
         return "Connection from " + host_name + "/" + port
 
     fn print_log_connect_message(self) raises -> None:

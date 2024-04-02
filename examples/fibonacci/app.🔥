@@ -2,9 +2,10 @@ from FireTCP import TCPResponse, TCPRequest, TCPService
 from FireTCP.servers import TCPLite
 
 
+# this is the slow version of fibonacci function
 fn kth_fibonacci(k: Int) raises -> Int:
     if k < 0:
-        let message = "invalid input to the kth_fib() function: '" + str(k) + "'"
+        var message = "invalid input to the kth_fib() function: '" + str(k) + "'"
         raise Error(message)
     if k <= 1:
         return k
@@ -15,8 +16,8 @@ fn kth_fibonacci(k: Int) raises -> Int:
 struct kthFib(TCPService):
     fn func(self, req: TCPRequest) raises -> TCPResponse:
         try:
-            let k: Int = atol(req.body())
-            let result: Int = kth_fibonacci(k=k)
+            var k: Int = atol(req.body())
+            var result: Int = kth_fibonacci(k=k)
             return TCPResponse(body=str(result))
         except Error:
             return TCPResponse(
@@ -28,7 +29,7 @@ struct kthFib(TCPService):
 
 
 fn main() raises -> None:
-    let fib_service = kthFib()
+    var fib_service = kthFib()
 
     var lite_server = TCPLite[kthFib](
         service=fib_service,

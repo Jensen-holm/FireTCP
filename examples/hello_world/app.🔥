@@ -4,7 +4,6 @@ from FireTCP.servers import TCPLite
 
 @value
 struct HelloService(TCPService):
-
     fn func(self, req: TCPRequest) raises -> TCPResponse:
         return TCPResponse(
             body="You sent the following data: " + req.body(),

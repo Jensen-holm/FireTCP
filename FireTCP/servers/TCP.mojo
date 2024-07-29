@@ -13,6 +13,7 @@ import time
 
 struct TCPLite[S: TCPService](Server):
     """'Lite' wrapper for the python socket library with HTTP protocol."""
+
     var __modules: PyModules
     var __py_socket: PythonObject
     var host_name: PythonObject
@@ -21,7 +22,9 @@ struct TCPLite[S: TCPService](Server):
     var port: Int
     var stats: ServerStats
 
-    fn __init__(inout self, service: S, port: Int, host_addr: StringLiteral) raises -> None:
+    fn __init__(
+        inout self, service: S, port: Int, host_addr: StringLiteral
+    ) raises -> None:
         self.port = port
         self.host_addr = host_addr
         self.service = service
@@ -35,7 +38,8 @@ struct TCPLite[S: TCPService](Server):
         self.__bind_pySocket()
 
     fn __bind_pySocket(self) raises -> None:
-        """Private funciton that binds the initialized python socket to the given host and port. this runs in __init__()"""
+        """Private funciton that binds the initialized python socket to the given host and port. this runs in __init__()
+        """
         _ = self.__py_socket.bind((self.host_addr, self.port))
 
     fn __close_socket(self) raises -> None:
@@ -60,12 +64,12 @@ struct TCPLite[S: TCPService](Server):
 
     @always_inline
     fn full_addr(self) raises -> String:
-        return str(self.host_addr) 
-                + "/" + self.port 
-        
+        return str(self.host_addr) + "/" + String(self.port)
+
     @always_inline
     fn __update_metrics(inout self, et: Float64) -> None:
-        """Private function that updates the metrics that enhance logging output."""
+        """Private function that updates the metrics that enhance logging output.
+        """
         self.stats.update(execution_time=et)
 
     fn serve(inout self) raises -> None:
@@ -79,7 +83,8 @@ struct TCPLite[S: TCPService](Server):
         var st: Float64 = time.now()
         var raw_request = connection.recieve_data()
         var response: TCPResponse = self.__handle_request(
-            connection=connection, raw_request=raw_request,
+            # connection=connection,
+            raw_request=raw_request,
         )
 
         connection.send_response[TCPResponse](response)
@@ -89,16 +94,23 @@ struct TCPLite[S: TCPService](Server):
         var execution_time: Float64 = (time.now() - st)
         self.__update_metrics(et=execution_time)
         response.print_log_message(
-            execution_time=self.stats.most_recent_secs(), 
+            execution_time=self.stats.most_recent_secs(),
             raw_request=raw_request,
-            symbol="🔥" if (execution_time <= self.stats.average_execution_time) else "🥶"
+            symbol="🔥" if (
+                execution_time <= self.stats.average_execution_time
+            ) else "🥶",
         )
 
-        # go back to listening for requests 
+        # go back to listening for requests
         self.serve()
 
-    fn __handle_request(self, raw_request: String, connection: Connection) raises -> TCPResponse:
-        """Private function that makes generates a Response object given a Request object."""
+    fn __handle_request(
+        self,
+        raw_request: String,
+        # connection: Connection
+    ) raises -> TCPResponse:
+        """Private function that makes generates a Response object given a Request object.
+        """
         if not raw_request:
             return TCPResponse.empty_error(error_str=EMPTY_REQUEST_MESSAGE)
 

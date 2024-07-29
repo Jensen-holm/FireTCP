@@ -17,7 +17,9 @@ struct ServerStats:
         self.total_execution_time += et
 
     fn update_average_et(inout self) -> None:
-        self.average_execution_time = self.total_execution_time / self.total_requests
+        self.average_execution_time = (
+            self.total_execution_time / self.total_requests
+        )
 
     fn update(inout self, execution_time: Float64) -> None:
         self.increment_reqs()

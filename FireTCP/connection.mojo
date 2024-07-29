@@ -7,7 +7,9 @@ struct Connection:
     var addr: PythonObject
     var __py: PythonObject
 
-    fn __init__(inout self, conn_addr: PythonObject, py: PythonObject) raises -> None:
+    fn __init__(
+        inout self, conn_addr: PythonObject, py: PythonObject
+    ) raises -> None:
         self.conn = conn_addr[0]
         self.addr = conn_addr[1]
         self.__py = py

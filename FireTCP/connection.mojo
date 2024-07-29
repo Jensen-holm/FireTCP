@@ -1,5 +1,5 @@
 from python import PythonObject
-from FireTCP.response import Response
+from .response import Resp
 
 
 struct Connection:
@@ -20,7 +20,7 @@ struct Connection:
         var data = self.conn.recv(size).decode(encoding)
         return str(data)
 
-    fn send_response[R: Response](self, response: R) raises -> None:
+    fn send_response[R: Resp](self, response: R) raises -> None:
         var response_bytes = response.to_bytes(py_builtins=self.__py)
         _ = self.conn.sendall(response_bytes)
 

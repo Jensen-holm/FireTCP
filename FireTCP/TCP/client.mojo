@@ -1,9 +1,10 @@
-from FireTCP.modules import PyModules
-from FireTCP.client import Client
-from FireTCP.request import TCPRequest
+from ..modules import PyModules
+from ..client import Cli
+from .request import Request
+from .response import Response
 
 
-struct TCPClient(Client):
+struct Client(Cli):
     var _modules: PyModules
     var _client_socket: PythonObject
     var host_name: StringLiteral
@@ -15,7 +16,7 @@ struct TCPClient(Client):
         self.host_name = host_name
         self.port = port
 
-    fn send_request(self, request: TCPRequest) raises -> TCPResponse:
+    fn send_request(self, request: Request) raises -> Response:
         _ = self._client_socket.connect((self.host_name, self.port))
         var request_bytes = request.to_bytes(
             py_builtins=self._modules.py,
@@ -25,4 +26,4 @@ struct TCPClient(Client):
         var raw_response = self._client_socket.recv(1024).decode()
 
         _ = self._client_socket.close()
-        return TCPResponse(body=str(raw_response))
+        return Response(body=str(raw_response))

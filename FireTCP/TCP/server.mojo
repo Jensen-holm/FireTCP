@@ -1,17 +1,17 @@
-from FireTCP.connection import Connection
-from FireTCP.service import TCPService
-from FireTCP.request import TCPRequest
-from FireTCP.response import TCPResponse
-from FireTCP.modules import PyModules
-from FireTCP.server_stats import ServerStats
-from FireTCP.server import Server
+from ..connection import Connection
+from .service import Service
+from .request import Request
+from .response import Response
+from ..modules import PyModules
+from ..server_stats import ServerStats
+from ..server import Server
 from FireTCP.common_messages import EMPTY_REQUEST_MESSAGE
 
 from python import Python, PythonObject
 import time
 
 
-struct TCPLite[S: TCPService](Server):
+struct TCPLite[S: Service](Server):
     """'Lite' wrapper for the python socket library with HTTP protocol."""
 
     var __modules: PyModules
@@ -82,12 +82,12 @@ struct TCPLite[S: TCPService](Server):
 
         var st: Float64 = time.now()
         var raw_request = connection.recieve_data()
-        var response: TCPResponse = self.__handle_request(
+        var response: Response = self.__handle_request(
             # connection=connection,
             raw_request=raw_request,
         )
 
-        connection.send_response[TCPResponse](response)
+        connection.send_response[Response](response)
         connection.close()
 
         # print additional response information
@@ -108,15 +108,15 @@ struct TCPLite[S: TCPService](Server):
         self,
         raw_request: String,
         # connection: Connection
-    ) raises -> TCPResponse:
+    ) raises -> Response:
         """Private function that makes generates a Response object given a Request object.
         """
         if not raw_request:
-            return TCPResponse.empty_error(error_str=EMPTY_REQUEST_MESSAGE)
+            return Response.empty_error(error_str=EMPTY_REQUEST_MESSAGE)
 
         try:
-            var request = TCPRequest(body=raw_request)
-            var response: TCPResponse = self.service.func(req=request)
+            var request = Request(body=raw_request)
+            var response: Response = self.service.func(req=request)
             return response
         except Error:
-            return TCPResponse.error(error_str=str(Error))
+            return Response.error(error_str=str(Error))

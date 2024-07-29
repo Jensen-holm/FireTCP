@@ -1,2 +1,2 @@
-trait Client:
+trait Cli:
     ...

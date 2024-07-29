@@ -1,14 +1,13 @@
-from FireTCP import TCPRequest, TCPResponse
-from FireTCP.clients import TCPClient
+from FireTCP import TCP
 
 
 fn main() raises -> None:
-    var client = TCPClient(
+    var client = TCP.TCPClient(
         port=9090,
         host_name="127.0.0.1",
     )
 
-    var request = TCPRequest(
+    var request = TCP.Request(
         body="Hello FireTCP",
     )
 

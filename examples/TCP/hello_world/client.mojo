@@ -2,7 +2,7 @@ from FireTCP import TCP
 
 
 fn main() raises -> None:
-    var client = TCP.TCPClient(
+    var client = TCP.Client(
         port=9090,
         host_name="127.0.0.1",
     )

@@ -14,7 +14,48 @@ Step 2: `$ curl -sS https://raw.githubusercontent.com/Jensen-holm/FireTCP/main/i
 
 Step 3: Once you have made a project and cloned the FireApi you can get coding! Check out the examples below or in the examples directory before getting started or [read this tutorial I made on medium](https://medium.com/@jensen.dev.01/socket-programming-in-mojo-e113f6c8cbef).
 
+### Example code
 
-### Goals
+app.mojo
+```mojo
+from FireTCP import TCP
 
-The main purpose of FireTCP is to create the base of the foundation when it comes to web programming. HTTP frameworks are built around TCP sockets, and I hope that since FireTCP is pretty user friendly and simple, an http web framework for mojo can easily be built around it.
+
+@value
+struct HelloService(TCP.Service):
+    fn func(self, req: TCP.Request) raises -> TCP.Response:
+        return TCP.Response(
+            body="You sent the following data: " + req.body(),
+        )
+
+
+fn main() raises -> None:
+    var server = TCP.TCPLite[HelloService](
+        service=HelloService(),
+        port=9090,
+        host_addr="127.0.0.1",
+    )
+
+    server.serve()
+```
+
+client.mojo
+```mojo
+from FireTCP import TCP
+
+
+fn main() raises -> None:
+    var client = TCP.TCPClient(
+        port=9090,
+        host_name="127.0.0.1",
+    )
+
+    var request = TCP.Request(
+        body="Hello FireTCP",
+    )
+
+    var response = client.send_request(request)
+    print(response.body())
+```
+
+output: "You sent the following data: Hello FireTCP"

@@ -73,42 +73,38 @@ struct TCPLite[S: Service](Server):
         self.stats.update(execution_time=et)
 
     fn serve(inout self) raises -> None:
-        if not self.stats.total_requests:
-            self.__print_start()
+        self.__print_start()
 
-        _ = self.__py_socket.listen()
-        var connection: Connection = self.__accept_connection()
-        connection.print_log_connect_message()
+        while True:
+            try:
+                _ = self.__py_socket.listen()
+                var connection: Connection = self.__accept_connection()
+                connection.print_log_connect_message()
 
-        var st: Float64 = time.now()
-        var raw_request = connection.recieve_data()
-        var response: Response = self.__handle_request(
-            # connection=connection,
-            raw_request=raw_request,
-        )
+                var st: Float64 = time.now()
+                var raw_request = connection.recieve_data()
+                var response: Response = self.__handle_request(
+                    raw_request=raw_request
+                )
 
-        connection.send_response[Response](response)
-        connection.close()
+                connection.send_response[Response](response)
+                connection.close()
 
-        # print additional response information
-        var execution_time: Float64 = (time.now() - st)
-        self.__update_metrics(et=execution_time)
-        response.print_log_message(
-            execution_time=self.stats.most_recent_secs(),
-            raw_request=raw_request,
-            symbol="🔥" if (
-                execution_time <= self.stats.average_execution_time
-            ) else "🥶",
-        )
+                # update stats
+                var execution_time: Float64 = (time.now() - st)
+                self.__update_metrics(et=execution_time)
+                response.print_log_message(
+                    execution_time=self.stats.most_recent_secs(),
+                    raw_request=raw_request,
+                    symbol="🔥" if (
+                        execution_time <= self.stats.average_execution_time
+                    ) else "🥶",
+                )
+            except Error:  # keyboard interrupt
+                self.__close_socket()
+                break
 
-        # go back to listening for requests
-        self.serve()
-
-    fn __handle_request(
-        self,
-        raw_request: String,
-        # connection: Connection
-    ) raises -> Response:
+    fn __handle_request(self, raw_request: String) raises -> Response:
         """Private function that makes generates a Response object given a Request object.
         """
         if not raw_request:

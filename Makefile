@@ -1,0 +1,4 @@
+
+test:
+	mojo test -I .
+

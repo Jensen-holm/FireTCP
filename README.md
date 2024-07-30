@@ -1,11 +1,10 @@
 # FireTCP
 
-Bring your [mojo](https://www.modular.com/max/mojo) Api to the web with a simple FireTCP server!!
+Bring your [mojo](https://www.modular.com/max/mojo) Api to your network with a simple FireTCP server!!
 
 ### Dependencies
- - mojo version 0.6.0 or newer
- - Python version 3.10 or newer (exact version doesn't really matter)
- - need to set the python library environment variable to compile
+ - mojo version 24.4.0 or newer
+ - Python version 3.10 or newer
 
 ### Hello FireApi
 Step 1: `$ mkdir hello_fire_api && cd hello_fire_api` <br>
